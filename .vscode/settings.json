@@ -1,0 +1,13 @@
+{
+    "cmake.configureSettings": {
+        "CMAKE_PREFIX_PATH": "D:/Qt/6.8.3/msvc2022_64"
+    },
+    "qt-ui.customWidgetsDesignerExePath": "D:/Qt/6.8.3/msvc2022_64/bin/designer.exe",
+    "qt-core.qtInstallationRoot": "D:/Qt",
+    "qt-qml.qmlls.customExePath": "D:/Qt/6.8.3/msvc2022_64/bin/qmlls.exe",
+    "qt-qml.qmlls.additionalImportPaths": [
+        "D:/Qt/6.8.3/msvc2022_64/qml"
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json"
+}

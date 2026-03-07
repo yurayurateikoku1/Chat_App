@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Qt-6.8.3-msvc2022_64_VS生成工具_2022_Release_amd64",
+    "visualStudio": "6009d5c1",
+    "visualStudioArchitecture": "x64",
+    "isTrusted": true,
+    "preferredGenerator": {
+      "name": "Ninja"
+    },
+    "cmakeSettings": {
+      "QT_QML_GENERATE_QMLLS_INI": "ON",
+      "CMAKE_CXX_FLAGS_DEBUG_INIT": "-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG",
+      "CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT": "-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG"
+    },
+    "environmentVariables": {
+      "VSCODE_QT_INSTALLATION": "D:\\Qt\\6.8.3\\msvc2022_64",
+      "PATH": "D:\\Qt\\6.8.3\\msvc2022_64\\bin;${env:PATH}"
+    },
+    "toolchainFile": "D:\\Qt\\6.8.3\\msvc2022_64\\lib\\cmake\\Qt6\\qt.toolchain.cmake"
+  }
+]
