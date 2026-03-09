@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Page {
     id: login_page
-    signal signUIRegisterRequested
+    signal signButtonRegisterClicked
     width: 400
     height: 600
     ColumnLayout {
@@ -48,7 +48,7 @@ Page {
                 id: button_register
                 text: "Register"
                 bgColor: Common.color3
-                onClicked: login_page.signUIRegisterRequested()
+                onClicked: login_page.signButtonRegisterClicked()
             }
 
             ButtonComp {

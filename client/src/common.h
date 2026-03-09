@@ -1,5 +1,5 @@
 #pragma once
-
+#include <QString>
 enum class ReqId
 {
     ID_GET_VERIFY_CODE = 1001,
@@ -19,3 +19,5 @@ enum class ErrorCode
     ERROR_JSON = 1,
     ERROR_NETWORK = 2
 };
+
+inline QString gate_url_prefix;

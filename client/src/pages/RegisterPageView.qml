@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Page {
     id: register_page
-    signal signUIBackRequested
+    signal signButtonBackClicked
     width: 400
     height: 600
 
@@ -90,7 +90,7 @@ Page {
                 Layout.fillWidth: true
                 text: "Back"
                 bgColor: Common.color3
-                onClicked: register_page.signUIBackRequested()
+                onClicked: register_page.signButtonBackClicked()
             }
         }
     }

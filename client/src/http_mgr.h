@@ -13,13 +13,13 @@ class HttpMgr : public QObject, public Singleton<HttpMgr>, public std::enable_sh
     Q_OBJECT
 public:
     ~HttpMgr();
+    void sendPostRequest(const QUrl &url, const QJsonObject &json, ReqId req_id, Modules module);
 
 private:
     friend class Singleton<HttpMgr>;
     HttpMgr();
     QNetworkAccessManager manager_;
 
-    void httpPostRequest(const QUrl &url, const QJsonObject &json, ReqId req_id, Modules module);
 private slots:
 
     void soltHttpDone(ReqId req_id, const std::string &res, ErrorCode code, Modules module);

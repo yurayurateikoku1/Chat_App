@@ -21,10 +21,11 @@ ApplicationWindow {
 
     Connections {
         target: stack_view.currentItem
-        function onSignUIRegisterRequested() {
+        ignoreUnknownSignals: true
+        function onSignButtonRegisterClicked() {
             stack_view.push(register_page);
         }
-        function onSignUIBackRequested() {
+        function onSignButtonBackClicked() {
             stack_view.pop();
         }
     }

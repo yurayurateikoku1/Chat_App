@@ -1,6 +1,7 @@
 #include "register_page.h"
 #include <QRegularExpression>
 #include "../http_mgr.h"
+#include <spdlog/spdlog.h>
 RegisterPage::RegisterPage(QObject *parent)
 {
     connect(HttpMgr::getInstance().get(), &HttpMgr::signRegisterModuleDone, this, &RegisterPage::slotRegisterModuleDone);
@@ -13,7 +14,9 @@ Q_INVOKABLE void RegisterPage::getVerifyCode(const QString &email)
     bool math = regex.match(email).hasMatch();
     if (math)
     {
-        /* code */
+        QJsonObject json;
+        json["email"] = email;
+        HttpMgr::getInstance()->sendPostRequest(QUrl(gate_url_prefix + "/get_verifycode"), json, ReqId::ID_GET_VERIFY_CODE, Modules::REGISTER);
     }
     else
     {
@@ -34,6 +37,7 @@ void RegisterPage::initHttpHandler()
 
                                auto email = obj.value("email").toString();
                                emit signUIMessage("The verification code has been sent to " + email, true);
+                               SPDLOG_INFO("The verification code has been sent to {}", email.toStdString());
                            }});
 }
 

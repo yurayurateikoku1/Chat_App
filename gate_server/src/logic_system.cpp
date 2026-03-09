@@ -1,5 +1,6 @@
 #include "logic_system.h"
 #include "csession.h"
+#include "verify_grpc_client.h"
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 LogicSystem::LogicSystem()
@@ -15,7 +16,7 @@ LogicSystem::LogicSystem()
                                        beast::ostream(session->response_.body()) << elem.first << ":" << elem.second << "\r\n";
                                    } });
     // 注册post请求处理
-    registerHandlePostReqCallback("/get_varifycode", [](std::shared_ptr<CSession> session)
+    registerHandlePostReqCallback("/get_verifycode", [](std::shared_ptr<CSession> session)
                                   {
                                       auto body_str = boost::beast::buffers_to_string(session->request_.body().data());
                                       SPDLOG_DEBUG("body_str:{}", body_str);
@@ -45,9 +46,11 @@ LogicSystem::LogicSystem()
                                       }
 
                                       auto email = src_root["email"].get<std::string>();
+                                      // 发送grpc请求获取验证码
+                                      GetVerifyRsp rsp = VerifyGrpcClient::getInstance()->getVerifyCode(email);
                                       SPDLOG_DEBUG("email:{}", email);
 
-                                      root["error"] = 0;
+                                      root["error"] = rsp.error();
                                       root["email"] = src_root["email"];
                                       beast::ostream(session->response_.body()) << root.dump(); });
 }

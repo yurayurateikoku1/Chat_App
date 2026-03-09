@@ -1,12 +1,17 @@
 #include "cserver.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include "common.h"
+#include "config_mgr.h"
 int main()
 {
+    ConfigMgr config_mgr;
+    std::string port = config_mgr["gate_server"]["port"];
+    unsigned short port_num = atoi(port.c_str());
     spdlog::stdout_color_mt("console");
+
     try
     {
-        unsigned short port = 8080;
         net::io_context io_context{1};
         // 注册系统信号处理
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
@@ -16,8 +21,8 @@ int main()
                                return;
                            }
                             io_context.stop(); });
-        std::make_shared<CServer>(io_context, port)->lunchServer();
-        SPDLOG_INFO("Server start at port {}", port);
+        std::make_shared<CServer>(io_context, port_num)->lunchServer();
+        SPDLOG_INFO("Server start at port {}", port_num);
         io_context.run();
     }
     catch (const std::exception &e)
