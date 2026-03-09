@@ -17,8 +17,10 @@ find_package(mysql-concpp CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} 
-    src/main.cpp
+    src/main.cpp src/common.h src/singleton.h
     src/cserver.cpp src/cserver.h
+    src/csession.cpp src/csession.h
+    src/logic_system.cpp src/logic_system.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
@@ -33,10 +35,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 configure_file(data/config.ini ${CMAKE_CURRENT_BINARY_DIR}/config.ini COPYONLY)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND}
-            -DSRC_DLLS="$<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>"
-            -DDEST_DIR="$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/CopyRuntimeDependencies.cmake"
-    COMMAND_EXPAND_LISTS
-)
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#     COMMAND ${CMAKE_COMMAND}
+#             -DSRC_DLLS="$<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>"
+#             -DDEST_DIR="$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+#             -P "${CMAKE_CURRENT_SOURCE_DIR}/CopyRuntimeDependencies.cmake"
+#     COMMAND_EXPAND_LISTS
+# )
