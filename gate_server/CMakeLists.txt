@@ -2,6 +2,7 @@ project(gate_server LANGUAGES CXX)
 List(PREPEND CMAKE_PREFIX_PATH
     "D:/C++Library/mysql-connector-c++-8.3.0-winx64"
     "D:/C++Library/spdlog-1.17.0/build/install/lib/cmake"
+    "D:/C++Library/json-3.12.0/build/install/share/cmake"
     "E:/WORKSPACE/Qt/Chat_App/conan_cmake_deps"
 )
 find_package(Boost CONFIG REQUIRED)
@@ -10,23 +11,25 @@ set(CMAKE_MAP_IMPORTED_CONFIG_DEBUG Release)
 set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL Release)
 
-find_package(jsoncpp CONFIG REQUIRED)
+# find_package(jsoncpp CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(grpc CONFIG REQUIRED)
 find_package(hiredis CONFIG REQUIRED)
 find_package(mysql-concpp CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
-add_executable(${PROJECT_NAME} 
-    src/main.cpp src/common.h src/singleton.h
+add_executable(${PROJECT_NAME}  
+    src/main.cpp src/common.h src/singleton.h src/utils.h
     src/cserver.cpp src/cserver.h
     src/csession.cpp src/csession.h
     src/logic_system.cpp src/logic_system.h
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     Boost::headers Boost::boost Boost::filesystem Boost::system 
-    JsonCpp::JsonCpp  
+    nlohmann_json::nlohmann_json  
     gRPC::grpc++ gRPC::grpc 
     hiredis::hiredis 
     mysql::concpp

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "singleton.h"
 #include <map>
+
 class CSession;
 typedef std::function<void(std::shared_ptr<CSession>)> httpHandler;
 
@@ -14,7 +15,18 @@ public:
     ~LogicSystem();
 
     bool handleGetRequest(const std::string &url, std::shared_ptr<CSession> session);
-    void handleRegisterGetRequest(const std::string &url, httpHandler handler);
+
+    bool handlePostRequest(const std::string &url, std::shared_ptr<CSession> session);
+
+    /// @brief 注册get请求回调
+    /// @param url
+    /// @param handler
+    void registerHandleGetReqCallback(const std::string &url, httpHandler handler);
+
+    /// @brief 注册post请求回调
+    /// @param url
+    /// @param handler
+    void registerHandlePostReqCallback(const std::string &url, httpHandler handler);
 
 private:
     LogicSystem();

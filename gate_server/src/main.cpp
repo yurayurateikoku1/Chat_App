@@ -17,6 +17,7 @@ int main()
                            }
                             io_context.stop(); });
         std::make_shared<CServer>(io_context, port)->lunchServer();
+        SPDLOG_INFO("Server start at port {}", port);
         io_context.run();
     }
     catch (const std::exception &e)
