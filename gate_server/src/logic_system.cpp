@@ -19,7 +19,7 @@ LogicSystem::LogicSystem()
     registerHandlePostReqCallback("/get_verifycode", [](std::shared_ptr<CSession> session)
                                   {
                                       auto body_str = boost::beast::buffers_to_string(session->request_.body().data());
-                                      SPDLOG_DEBUG("body_str:{}", body_str);
+                                      SPDLOG_INFO("body_str:{}", body_str);
                                       session->response_.set(http::field::content_type, "text/json");
 
                                       nlohmann::json root;
@@ -46,9 +46,10 @@ LogicSystem::LogicSystem()
                                       }
 
                                       auto email = src_root["email"].get<std::string>();
+                                      SPDLOG_DEBUG("email:{}", email);
                                       // 发送grpc请求获取验证码
                                       GetVerifyRsp rsp = VerifyGrpcClient::getInstance()->getVerifyCode(email);
-                                      SPDLOG_DEBUG("email:{}", email);
+                                      
 
                                       root["error"] = rsp.error();
                                       root["email"] = src_root["email"];
