@@ -24,8 +24,31 @@ Q_INVOKABLE void RegisterPage::getVerifyCode(const QString &email)
     }
 }
 
+Q_INVOKABLE void RegisterPage::registerUser(const QString &username, const QString &password, const QString &confirm_password, const QString &email, const QString &verify_code)
+{
+    if (username == "" || password == "" || email == "" || verify_code == "")
+    {
+        emit signUIMessage("The input item cannot be empty!", false);
+        return;
+    }
+
+    if (password != confirm_password)
+    {
+        emit signUIMessage("The two passwords are inconsistent!", false);
+        return;
+    }
+
+    QJsonObject json;
+    json["username"] = username;
+    json["password"] = password;
+    json["email"] = email;
+    json["verifycode"] = verify_code;
+    HttpMgr::getInstance()->sendPostRequest(QUrl(gate_url_prefix + "/user_register"), json, ReqId::ID_REG_USER, Modules::REGISTER);
+}
+
 void RegisterPage::initHttpHandler()
 {
+    // 获取验证码后处理
     http_handlers_.insert({ReqId::ID_GET_VERIFY_CODE, [this](const QJsonObject &obj)
                            {
                                int erro_code = obj.value("error").toInt();
@@ -39,6 +62,20 @@ void RegisterPage::initHttpHandler()
                                emit signUIMessage("The verification code has been sent to " + email, true);
                                SPDLOG_INFO("The verification code has been sent to {}", email.toStdString());
                            }});
+
+    // 注册用户后处理
+    http_handlers_.insert({ReqId::ID_REG_USER, [this](const QJsonObject &obj)
+                           {
+                               int erro_code = obj.value("error").toInt();
+                               if (!erro_code == 0)
+                               {
+                                   emit signUIMessage("Parameter error!", false);
+                                   return;
+                               }
+                               auto email = obj.value("email").toString();
+                               emit signUIMessage("Registration succeeded!", true);
+                               SPDLOG_INFO("{} register succeeded!", email.toStdString());
+                           }});
 }
 
 void RegisterPage::slotRegisterModuleDone(ReqId id, const std::string &res, ErrorCode code)
@@ -49,6 +86,7 @@ void RegisterPage::slotRegisterModuleDone(ReqId id, const std::string &res, Erro
         return;
     }
 
+    // 解析json
     QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(res));
     if (doc.isNull())
     {
@@ -61,5 +99,6 @@ void RegisterPage::slotRegisterModuleDone(ReqId id, const std::string &res, Erro
         return;
     }
 
+    // 处理对应功能的后处理
     http_handlers_[id](doc.object());
 }

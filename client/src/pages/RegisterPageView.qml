@@ -70,7 +70,7 @@ Page {
             text: "Register"
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            onClicked: toast.showMessage("错误提示", "red")
+            onClicked: RegisterPage.registerUser(textfield_username.text, textfield_password.text, textfield_confirmpd.text, textfield_email.text, textfield_verification.text)
         }
 
         Item {

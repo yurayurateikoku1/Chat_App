@@ -12,14 +12,17 @@ public:
     explicit RegisterPage(QObject *parent = nullptr);
 
     Q_INVOKABLE void getVerifyCode(const QString &email);
-
+    Q_INVOKABLE void registerUser(const QString &username, const QString &password, const QString &confirm_password,
+                                  const QString &email, const QString &verify_code);
 private slots:
+
+    /// @brief 处理注册模块http响应
     void slotRegisterModuleDone(ReqId id, const std::string &res, ErrorCode code);
 signals:
     void signUIMessage(const QString &message, bool normal);
 
 private:
-    /// @brief 初始化HttpHandler
+    /// @brief 初始化HttpHandler,封装http响应回调后处理
     void initHttpHandler();
 
     std::map<ReqId, std::function<void(const QJsonObject &)>> http_handlers_;

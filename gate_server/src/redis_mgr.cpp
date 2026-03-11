@@ -76,7 +76,7 @@ RedisMgr::RedisMgr()
     auto &config_mgr = ConfigMgr::getInstance();
     auto host = config_mgr["redis"]["host"];
     auto port = config_mgr["redis"]["port"];
-    auto passwd = config_mgr["redis"]["passwd"];
+    auto passwd = config_mgr["redis"]["pass"];
 
     redis_pool_.reset(new RedisPool(5, host, atoi(port.c_str()), passwd));
 }

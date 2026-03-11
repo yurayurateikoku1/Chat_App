@@ -19,22 +19,26 @@ void HttpMgr::sendPostRequest(const QUrl &url, const QJsonObject &json, ReqId re
                 // 错误处理
                 if (reply->error() != QNetworkReply::NoError)
                 {
-                    emit self->signHttpDone(req_id, "", ErrorCode::ERROR_NETWORK, module);
+                    //发送信号通知收到响应
+                    emit self->signHttpDone(req_id, "", ErrorCode::RPCFAILED, module);
                     reply->deleteLater();
                     return;
                 } 
                    
                 std::string res = reply->readAll().toStdString();
+                //发送信号通知收到响应
                 emit self->signHttpDone(req_id, res, ErrorCode::SUCCESS, module);
                 reply->deleteLater(); });
 }
 
 void HttpMgr::soltHttpDone(ReqId req_id, const std::string &res, ErrorCode code, Modules module)
 {
+    // 分发响应到各个模块
     switch (module)
     {
     case Modules::REGISTER:
     {
+        // 发送信号到注册模块
         emit signRegisterModuleDone(req_id, res, code);
         break;
     }
