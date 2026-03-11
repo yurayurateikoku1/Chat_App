@@ -74,7 +74,7 @@ void RegisterPage::initHttpHandler()
                                }
                                auto email = obj.value("email").toString();
                                emit signUIMessage("Registration succeeded!", true);
-                               SPDLOG_INFO("{} register succeeded!", email.toStdString());
+                               SPDLOG_INFO("{} ,uid {} register succeeded!", email.toStdString(), obj.value("uid").toInt());
                            }});
 }
 

@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include "redis_mgr.h"
+#include "mysql_mgr.h"
 LogicSystem::LogicSystem()
 {
     // 注册get请求处理
@@ -96,8 +97,20 @@ LogicSystem::LogicSystem()
                                           return;
                                       }
 
+                                      //查找数据库判断用户是否存在
+                                      int uid = MysqlMgr::getInstance().registerUser(src_root["username"].get<std::string>(), src_root["password"].get<std::string>(), src_root["email"].get<std::string>());
+                                      if(uid==0||uid==-1)
+                                      {
+                                        SPDLOG_ERROR("User or email is exist");
+                                        root["error"] = static_cast<int>(ErrorCode::USEREXISTED);
+                                        beast::ostream(session->response_.body()) << root.dump();
+                                        return;
+                                      }
+
+
                                       root["error"] = static_cast<int>(ErrorCode::SUCCESS);
                                       root["email"] = src_root["email"];
+                                      root["uid"] = uid;
                                       root["password"] = src_root["password"];
                                       root["username"] = src_root["username"];
                                       root["verifycode"] = src_root["verifycode"];

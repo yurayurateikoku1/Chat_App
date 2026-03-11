@@ -28,8 +28,10 @@ public:
               const std::string &schema);
     ~MysqlPool();
 
-    sql::Connection *getConn();
-    void returnConn(sql::Connection *conn);
+    /// @brief 检查连接
+    void checkConnection();
+    std::unique_ptr<SqlConnection> getConnection();
+    void returnConnection(std::unique_ptr<SqlConnection> conn);
 
 private:
     std::atomic<bool> flag_stop_;
@@ -38,13 +40,46 @@ private:
     int port_;
     std::string username_;
     std::string passwd_;
-    std::string schema_;
+    std::string schema_; // 数据库名
     std::queue<std::unique_ptr<SqlConnection>> pool_;
     std::mutex mutex_;
     std::condition_variable cv_;
     std::thread check_thread_;
 };
 
+struct UserInfo
+{
+    std::string name;
+    std::string passwd;
+    int uid;
+    std::string email;
+};
+
+class MysqlStore
+{
+public:
+    MysqlStore();
+    ~MysqlStore();
+    int registerUser(const std::string &username, const std::string &password, const std::string &email);
+    bool checkEmail(const std::string &username, const std::string &email);
+    bool checkPassword(const std::string &username, const std::string &password);
+
+private:
+    std::unique_ptr<MysqlPool> mysql_pool_;
+};
+
 class MysqlMgr
 {
+public:
+    static MysqlMgr &getInstance()
+    {
+        static MysqlMgr instance;
+        return instance;
+    }
+    ~MysqlMgr();
+    int registerUser(const std::string &username, const std::string &password, const std::string &email);
+
+private:
+    MysqlMgr();
+    MysqlStore mysql_store_;
 };
