@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  mysqlredis:
+    build: ./docker/mysqlredis
+    container_name: mysqlredis
+    ports:
+      - "3306:3306"
+      - "6379:6379"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - E:/WORKSPACE/Qt/Chat_App/docker_data/mysql:/var/lib/mysql
+      - E:/WORKSPACE/Qt/Chat_App/docker_data/redis:/data
+    restart: always
