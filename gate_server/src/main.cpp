@@ -5,7 +5,7 @@
 #include "config_mgr.h"
 int main()
 {
-    ConfigMgr config_mgr;
+    ConfigMgr &config_mgr = ConfigMgr::getInstance();
     std::string port = config_mgr["gate_server"]["port"];
     unsigned short port_num = atoi(port.c_str());
     spdlog::stdout_color_mt("console");

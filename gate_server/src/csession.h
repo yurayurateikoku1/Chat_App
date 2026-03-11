@@ -6,9 +6,11 @@ class CSession : public std::enable_shared_from_this<CSession>
 {
 public:
     friend class LogicSystem;
-    CSession(boost::asio::ip::tcp::socket socket);
+    CSession(boost::asio::io_context &io_context);
     /// @brief 启动会话
     void lunchSession();
+
+    boost::asio::ip::tcp::socket &getSocket() { return socket_; }
 
 private:
     /// @brief 超时检测

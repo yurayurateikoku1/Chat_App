@@ -19,7 +19,8 @@ find_package(mysql-concpp CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}  
-    src/main.cpp src/common.h src/singleton.h src/utils.h
+    src/main.cpp src/common.h src/singleton.h src/utils.h 
+    src/iocontext_pool.h src/iocontext_pool.cpp
     src/config_mgr.h src/config_mgr.cpp
     src/cserver.cpp src/cserver.h
     src/csession.cpp src/csession.h

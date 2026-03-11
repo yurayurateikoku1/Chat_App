@@ -35,7 +35,12 @@ struct SectionInfo
 class ConfigMgr
 {
 public:
-    ConfigMgr();
+    static ConfigMgr &getInstance()
+    {
+        static ConfigMgr instance_;
+        return instance_;
+    }
+
     ConfigMgr(const ConfigMgr &other) { config_sections_ = other.config_sections_; }
     ConfigMgr &operator=(const ConfigMgr &other)
     {
@@ -57,5 +62,6 @@ public:
     }
 
 private:
+    ConfigMgr();
     std::map<std::string, SectionInfo> config_sections_;
 };

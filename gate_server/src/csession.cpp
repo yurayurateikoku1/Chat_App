@@ -2,8 +2,8 @@
 #include "logic_system.h"
 #include "utils.h"
 #include <spdlog/spdlog.h>
-CSession::CSession(boost::asio::ip::tcp::socket socket)
-    : socket_(std::move(socket))
+CSession::CSession(boost::asio::io_context &io_context)
+    : socket_(io_context)
 {
 }
 
