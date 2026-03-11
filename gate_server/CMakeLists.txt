@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}
     src/message.pb.h src/message.pb.cc
     src/logic_system.cpp src/logic_system.h
     src/verify_grpc_client.h src/verify_grpc_client.cpp
+    src/redis_mgr.h src/redis_mgr.cpp
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)

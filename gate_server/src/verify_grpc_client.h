@@ -15,6 +15,7 @@ using message::GetVerifyReq;
 using message::GetVerifyRsp;
 using message::VerifyService;
 
+/// @brief rpc连接池
 class RPCConnectionPool
 {
 public:
