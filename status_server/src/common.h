@@ -24,6 +24,7 @@ enum class ErrorCode
     PASSWDUPFAILED = 1008,   // 密码修改失败
     TOKENINVALID = 1009,     // token无效
     UIDINVALID = 1010,       // uid无效
+
 };
 
 class Defer

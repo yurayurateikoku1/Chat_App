@@ -13,13 +13,14 @@ qt_add_executable(appclient
     src/main.cpp src/singleton.h
     src/pages/login_page.cpp     src/pages/login_page.h
     src/pages/register_page.cpp  src/pages/register_page.h
+    src/pages/reset_page.cpp     src/pages/reset_page.h
     src/http_mgr.cpp            src/http_mgr.h
 )
 
 qt_add_resources(appclient "resources"
     PREFIX "/"
     FILES
-        assets/chat.png
+        assets/chat.png assets/kejianxing-bukejian.png assets/kejianxing-kejian.png
 )
 
 set_source_files_properties(src/pages/Common.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
@@ -31,8 +32,9 @@ qt_add_qml_module(appclient
         src/pages/Main.qml         src/pages/Common.qml 
         src/pages/LoginPageView.qml
         src/pages/RegisterPageView.qml
+        src/pages/ResetPageView.qml
         src/components/TextFieldComp.qml src/components/ButtonComp.qml src/components/ToastComp.qml
-
+        src/components/TimerButtonComp.qml
 )
 
 set_target_properties(appclient PROPERTIES

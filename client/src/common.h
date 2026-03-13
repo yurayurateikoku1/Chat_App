@@ -3,14 +3,17 @@
 enum class ReqId
 {
     ID_GET_VERIFY_CODE = 1001,
-    ID_REG_USER = 1002
+    ID_REG_USER = 1002,
+    ID_RESET_PASSWORD = 1003,
+    ID_LOGIN_USER = 1004
+
 };
 
 enum class Modules
 {
     REGISTER = 0,
-    LOGIN = 1,
-    CHAT = 2
+    RESET = 1,
+    LOGIN = 2
 };
 
 enum class ErrorCode
@@ -24,6 +27,14 @@ enum class ErrorCode
     ERROR_PASSWD = 1006,     // 密码错误
     EMAILNOTMATCH = 1007,    // 邮箱不匹配
     PASSWDUPFAILED = 1008,   // 密码修改失败
+};
+
+struct ServerInfo
+{
+    std::string host;
+    std::string port;
+    std::string token;
+    int uid;
 };
 
 inline QString gate_url_prefix;

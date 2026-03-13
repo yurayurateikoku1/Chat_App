@@ -25,5 +25,8 @@ private slots:
     void soltHttpDone(ReqId req_id, const std::string &res, ErrorCode code, Modules module);
 signals:
     void signHttpDone(ReqId id, const std::string &res, ErrorCode code, Modules module);
+
     void signRegisterModuleDone(ReqId id, const std::string &res, ErrorCode code);
+    void signResetModuleDone(ReqId id, const std::string &res, ErrorCode code);
+    void signLoginModuleDone(ReqId id, const std::string &res, ErrorCode code);
 };

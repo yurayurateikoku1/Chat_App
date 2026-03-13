@@ -3,11 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Page {
-    id: login_page
-    signal signButtonRegisterClicked
-    signal signButtonForgetClicked
-    property alias textfield_email: textfield_email
-    property alias toast: toast
+    id: reset_page
+    signal signButtonBackClicked
     width: 400
     height: 600
 
@@ -16,27 +13,19 @@ Page {
     }
 
     Connections {
-        target: LoginPage
+        target: ResetPage
         function onSign2UIMessage(msg, normal) {
             toast.showMessage(msg, normal ? "green" : "red");
-        }
-
-        function onSign2UILoginStatus(status) {
-            button_login.enabled = true;
         }
     }
 
     ColumnLayout {
         anchors.centerIn: parent
 
-        Image {
-            Layout.alignment: Qt.AlignHCenter
-            source: "qrc:/assets/chat.png"
-            fillMode: Image.PreserveAspectFit
-        }
-
-        Item {
-            Layout.fillHeight: true
+        TextFieldComp {
+            id: textfield_username
+            placeholderText: "Username"
+            Layout.fillWidth: true
         }
 
         TextFieldComp {
@@ -47,8 +36,23 @@ Page {
 
         RowLayout {
             TextFieldComp {
+                id: textfield_verification
+                placeholderText: "VerificationCode"
+                Layout.fillWidth: true
+            }
+
+            TimerButtonComp {
+                id: button_getverify
+                text: "GetVerify"
+                bgColor: Common.color3
+                onClicked: ResetPage.getVerifyCode(textfield_email.text)
+            }
+        }
+
+        RowLayout {
+            TextFieldComp {
                 id: textfield_password
-                placeholderText: "Password"
+                placeholderText: "NewPassword"
                 echoMode: checkbox1.checked ? TextInput.Normal : TextInput.Password
                 Layout.fillWidth: true
             }
@@ -68,34 +72,33 @@ Page {
             }
         }
 
-        ButtonComp {
-            id: button_login
-            text: "Login"
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            onClicked: {
-                button_login.enabled = false;
-                LoginPage.loginUser(textfield_email.text, textfield_password.text);
-            }
-        }
-
         Item {
             Layout.fillHeight: true
         }
+
+        ButtonComp {
+            id: button_reset
+            text: "Reset"
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            onClicked: ResetPage.resetPassword(textfield_username.text, textfield_password.text, textfield_email.text, textfield_verification.text)
+        }
+
         RowLayout {
 
             ButtonComp {
-                id: button_register
-                text: "Register"
+                id: button_clear
+                text: "Clear"
+                Layout.fillWidth: true
                 bgColor: Common.color3
-                onClicked: login_page.signButtonRegisterClicked()
             }
 
             ButtonComp {
-                id: button_forget
-                text: "Forget"
+                id: button_back
+                Layout.fillWidth: true
+                text: "Back"
                 bgColor: Common.color3
-                onClicked: login_page.signButtonForgetClicked()
+                onClicked: reset_page.signButtonBackClicked()
             }
         }
     }

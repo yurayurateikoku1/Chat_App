@@ -3,5 +3,6 @@ project(Chat_APP VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-# add_subdirectory(client)
-add_subdirectory(gate_server)
+add_subdirectory(client)
+# add_subdirectory(gate_server)
+# add_subdirectory(status_server)

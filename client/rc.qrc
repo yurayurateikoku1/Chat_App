@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>assets/chat.png</file>
+        <file>assets/kejianxing-kejian.png</file>
+        <file>assets/kejianxing-bukejian.png</file>
     </qresource>
 </RCC>

@@ -14,7 +14,7 @@ Page {
 
     Connections {
         target: RegisterPage
-        function onSignUIMessage(msg, normal) {
+        function onSign2UIMessage(msg, normal) {
             toast.showMessage(msg, normal ? "green" : "red");
         }
     }
@@ -34,26 +34,60 @@ Page {
             Layout.fillWidth: true
         }
 
-        TextFieldComp {
-            id: textfield_password
-            placeholderText: "Password"
-            Layout.fillWidth: true
+        RowLayout {
+            TextFieldComp {
+                id: textfield_password
+                placeholderText: "Password"
+                echoMode: checkbox1.checked ? TextInput.Normal : TextInput.Password
+                Layout.fillWidth: true
+            }
+
+            CheckBox {
+                id: checkbox1
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: 20
+                implicitHeight: 20
+                padding: 0
+                indicator: Image {
+                    anchors.centerIn: parent
+                    width: 20
+                    height: 20
+                    source: checkbox1.checked ? "qrc:/assets/kejianxing-kejian.png" : "qrc:/assets/kejianxing-bukejian.png"
+                }
+            }
         }
 
-        TextFieldComp {
-            id: textfield_confirmpd
-            placeholderText: "ConfirmPassword"
-            Layout.fillWidth: true
+        RowLayout {
+            TextFieldComp {
+                id: textfield_confirmpd
+                placeholderText: "ConfirmPassword"
+                echoMode: checkbox2.checked ? TextInput.Normal : TextInput.Password
+                Layout.fillWidth: true
+            }
+
+            CheckBox {
+                id: checkbox2
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: 20
+                implicitHeight: 20
+                padding: 0
+                indicator: Image {
+                    anchors.centerIn: parent
+                    width: 20
+                    height: 20
+                    source: checkbox2.checked ? "qrc:/assets/kejianxing-kejian.png" : "qrc:/assets/kejianxing-bukejian.png"
+                }
+            }
         }
 
         RowLayout {
             TextFieldComp {
                 id: textfield_verification
-                placeholderText: "verificationCode"
+                placeholderText: "VerificationCode"
                 Layout.fillWidth: true
             }
 
-            ButtonComp {
+            TimerButtonComp {
                 id: button_getverify
                 text: "GetVerify"
                 bgColor: Common.color3

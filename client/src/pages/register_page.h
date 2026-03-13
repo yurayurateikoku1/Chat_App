@@ -19,7 +19,8 @@ private slots:
     /// @brief 处理注册模块http响应
     void slotRegisterModuleDone(ReqId id, const std::string &res, ErrorCode code);
 signals:
-    void signUIMessage(const QString &message, bool normal);
+    void sign2UIMessage(const QString &message, bool normal);
+    void sign2UIRegisterSuccess(const QString &email);
 
 private:
     /// @brief 初始化HttpHandler,封装http响应回调后处理

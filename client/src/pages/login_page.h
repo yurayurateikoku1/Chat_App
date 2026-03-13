@@ -1,7 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QQmlEngine>
-
+#include "../common.h"
 class LoginPage : public QObject
 {
     Q_OBJECT
@@ -11,9 +11,22 @@ class LoginPage : public QObject
 public:
     explicit LoginPage(QObject *parent = nullptr);
 
-    Q_INVOKABLE void loginUser(const QString &username, const QString &password);
+    Q_INVOKABLE void loginUser(const QString &email, const QString &password);
 
 signals:
-    void signLoginSuccess();
-    void signLoginFailed();
+    void sign2UILoginStatus(bool status);
+    void sign2UIMessage(const QString &message, bool normal);
+
+    /// @brief 发送连接TCP信号
+    /// @param info
+    void signConnectTCP(ServerInfo info);
+private slots:
+    void slotLoginModuleDone(ReqId id, const std::string &res, ErrorCode code);
+
+private:
+    void initHttpHandler();
+    std::map<ReqId, std::function<void(const QJsonObject &)>> http_handlers_;
+
+    int uid_ = -1;
+    std::string token_;
 };

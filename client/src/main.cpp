@@ -6,11 +6,13 @@
 #include <QSettings>
 #include <QQuickStyle>
 #include <QDir>
+#include <QIcon>
 int main(int argc, char *argv[])
 {
     spdlog::stdout_color_mt("console");
     QGuiApplication app(argc, argv);
     QQuickStyle::setStyle("Basic");
+    app.setWindowIcon(QIcon(":/assets/chat.png"));
 
     QString app_path = QGuiApplication::applicationDirPath();
     QString config_path = QString(QDir::toNativeSeparators(app_path + QDir::separator() + "config.ini"));
@@ -27,6 +29,7 @@ int main(int argc, char *argv[])
         []()
         { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
+
     engine.loadFromModule("client", "Main");
 
     return app.exec();

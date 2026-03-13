@@ -42,7 +42,18 @@ void HttpMgr::soltHttpDone(ReqId req_id, const std::string &res, ErrorCode code,
         emit signRegisterModuleDone(req_id, res, code);
         break;
     }
-
+    case Modules::RESET:
+    {
+        // 发送信号到重置密码模块
+        emit signResetModuleDone(req_id, res, code);
+        break;
+    }
+    case Modules::LOGIN:
+    {
+        // 发送信号到登录模块
+        emit signLoginModuleDone(req_id, res, code);
+        break;
+    }
     default:
         break;
     }
