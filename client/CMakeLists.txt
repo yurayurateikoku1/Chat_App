@@ -17,12 +17,33 @@ qt_add_executable(appclient
     src/http_mgr.cpp            src/http_mgr.h
     src/tcp_mgr.cpp             src/tcp_mgr.h
     src/user_model.cpp            src/user_model.h
+    src/pages/chat_page.cpp     src/pages/chat_page.h
+    src/models/chat_message_model.cpp src/models/chat_message_model.h
+    src/models/chat_list_model.cpp src/models/chat_list_model.h
+    src/models/contact_list_model.cpp src/models/contact_list_model.h
+    src/models/search_list_model.cpp src/models/search_list_model.h
 )
 
 qt_add_resources(appclient "resources"
     PREFIX "/"
     FILES
         assets/chat.png assets/kejianxing-bukejian.png assets/kejianxing-kejian.png
+        assets/duihuaxinxi.png assets/fenxiang.png assets/kaixin.png
+        assets/shangchuan.png assets/sousuo.png assets/tianjiayonghu.png
+        assets/tongxunlu.png
+        assets/avatars/Artboard_0.png
+        assets/avatars/Artboard_1.png assets/avatars/Artboard_2.png assets/avatars/Artboard_3.png
+        assets/avatars/Artboard_4.png assets/avatars/Artboard_5.png assets/avatars/Artboard_6.png
+        assets/avatars/Artboard_7.png assets/avatars/Artboard_8.png assets/avatars/Artboard_9.png
+        assets/avatars/Artboard_10.png assets/avatars/Artboard_11.png assets/avatars/Artboard_12.png
+        assets/avatars/Artboard_13.png assets/avatars/Artboard_14.png assets/avatars/Artboard_15.png
+        assets/avatars/Artboard_16.png assets/avatars/Artboard_17.png assets/avatars/Artboard_18.png
+        assets/avatars/Artboard_19.png assets/avatars/Artboard_20.png assets/avatars/Artboard_21.png
+        assets/avatars/Artboard_22.png assets/avatars/Artboard_23.png assets/avatars/Artboard_24.png
+        assets/avatars/Artboard_25.png assets/avatars/Artboard_26.png assets/avatars/Artboard_27.png
+        assets/avatars/Artboard_28.png assets/avatars/Artboard_29.png assets/avatars/Artboard_30.png
+        assets/avatars/Artboard_31.png assets/avatars/Artboard_32.png assets/avatars/Artboard_33.png
+        assets/avatars/Artboard_34.png assets/avatars/Artboard_35.png
 )
 
 set_source_files_properties(src/pages/Common.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
@@ -36,7 +57,12 @@ qt_add_qml_module(appclient
         src/pages/RegisterPageView.qml
         src/pages/ResetPageView.qml
         src/components/TextFieldComp.qml src/components/ButtonComp.qml src/components/ToastComp.qml
-        src/components/TimerButtonComp.qml
+        src/components/TimerButtonComp.qml src/components/ToolButtonComp.qml
+        src/components/CompoundList.qml src/components/TextEditComp.qml src/components/ChatHeaderComp.qml
+        src/components/ChatList.qml src/components/SearchList.qml src/components/ContactList.qml
+        src/components/ChatBubbleComp.qml src/components/MessageWindowList.qml
+        src/components/SideBarComp.qml
+        src/pages/ChatPageView.qml
 )
 
 set_target_properties(appclient PROPERTIES

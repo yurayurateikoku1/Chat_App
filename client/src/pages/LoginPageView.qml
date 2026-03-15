@@ -8,6 +8,7 @@ Page {
     signal signButtonForgetClicked
     property alias textfield_email: textfield_email
     property alias toast: toast
+    property alias button_login: button_login
     width: 400
     height: 600
 
@@ -19,10 +20,6 @@ Page {
         target: LoginPage
         function onSign2UIMessage(msg, normal) {
             toast.showMessage(msg, normal ? "green" : "red");
-        }
-
-        function onSign2UILoginStatus(status) {
-            button_login.enabled = true;
         }
     }
 
