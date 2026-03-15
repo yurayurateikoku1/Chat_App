@@ -17,11 +17,8 @@ signals:
     void sign2UILoginStatus(bool status);
     void sign2UIMessage(const QString &message, bool normal);
 
-    /// @brief 发送连接TCP信号
-    /// @param info
-    void signConnectTCP(ServerInfo info);
 private slots:
-    void slotLoginModuleDone(ReqId id, const std::string &res, ErrorCode code);
+    void handleLoginModule(ReqId id, const std::string &res, ErrorCode code);
 
 private:
     void initHttpHandler();

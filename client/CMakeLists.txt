@@ -15,6 +15,8 @@ qt_add_executable(appclient
     src/pages/register_page.cpp  src/pages/register_page.h
     src/pages/reset_page.cpp     src/pages/reset_page.h
     src/http_mgr.cpp            src/http_mgr.h
+    src/tcp_mgr.cpp             src/tcp_mgr.h
+    src/user_model.cpp            src/user_model.h
 )
 
 qt_add_resources(appclient "resources"

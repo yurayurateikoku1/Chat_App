@@ -14,7 +14,7 @@ public:
 private slots:
 
     /// @brief 处理重置模块http响应
-    void slotResetModuleDone(ReqId id, const std::string &res, ErrorCode code);
+    void handleResetModule(ReqId id, const std::string &res, ErrorCode code);
 signals:
     void sign2UIMessage(const QString &message, bool normal);
     void sign2UIResetSuccess(const QString &email);

@@ -1,12 +1,40 @@
 #include "login_page.h"
 #include <QRegularExpression>
 #include "../http_mgr.h"
+#include "../tcp_mgr.h"
 #include <spdlog/spdlog.h>
 
 LoginPage::LoginPage(QObject *parent) : QObject(parent)
 {
     initHttpHandler();
-    connect(HttpMgr::getInstance().get(), &HttpMgr::signLoginModuleDone, this, &LoginPage::slotLoginModuleDone);
+    connect(HttpMgr::getInstance().get(), &HttpMgr::signLoginModuleDone, this, &LoginPage::handleLoginModule);
+    // tcp连接状态
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signTcpConnectionStatus, this, [this](bool status)
+            {
+            if (status)
+            {
+                emit sign2UIMessage("Logining...", true);
+                QJsonObject json;
+                json["uid"]=uid_;
+                json["token"]=QString::fromStdString(token_);
+
+                QJsonDocument doc(json);
+                QString json_str = doc.toJson(QJsonDocument::Compact);
+                
+                //通过TCP向ChatServer发送登录请求
+                QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [json_str]
+                                          { TCPMgr::getInstance()->tcpSendData(ReqId::ID_CHAT_LOGIN,json_str); }, Qt::QueuedConnection);
+            }
+            else
+            {
+                emit sign2UIMessage("Network request failed!", false);
+            } });
+    // chatServer登录状态
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signLoginChatStatus, this, [this](bool status)
+            { 
+                emit sign2UILoginStatus(status); 
+
+                SPDLOG_INFO("Login status: {}", status); });
 }
 
 void LoginPage::loginUser(const QString &email, const QString &password)
@@ -50,12 +78,17 @@ void LoginPage::initHttpHandler()
                                server_info.port = obj.value("port").toString().toStdString();
                                server_info.token = obj.value("token").toString().toStdString();
                                server_info.uid = obj.value("uid").toInt();
-                               SPDLOG_INFO("{} ,uid {} login succeeded!", email.toStdString(), server_info.uid);
-                               emit sign2UILoginStatus(true);
+
+                               uid_ = server_info.uid;
+                               token_ = server_info.token;
+                               SPDLOG_INFO("tcp connect to host: {},port: {}", server_info.host, server_info.port);
+                               // 长连接tcp
+                               QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [server_info]
+                                                         { TCPMgr::getInstance()->tcpConnection(server_info); }, Qt::QueuedConnection);
                            }});
 }
 
-void LoginPage::slotLoginModuleDone(ReqId id, const std::string &res, ErrorCode code)
+void LoginPage::handleLoginModule(ReqId id, const std::string &res, ErrorCode code)
 {
     if (code != ErrorCode::SUCCESS)
     {

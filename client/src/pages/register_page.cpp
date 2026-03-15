@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 RegisterPage::RegisterPage(QObject *parent)
 {
-    connect(HttpMgr::getInstance().get(), &HttpMgr::signRegisterModuleDone, this, &RegisterPage::slotRegisterModuleDone);
+    connect(HttpMgr::getInstance().get(), &HttpMgr::signRegisterModuleDone, this, &RegisterPage::handleRegisterModule);
     initHttpHandler();
 }
 
@@ -79,7 +79,7 @@ void RegisterPage::initHttpHandler()
                            }});
 }
 
-void RegisterPage::slotRegisterModuleDone(ReqId id, const std::string &res, ErrorCode code)
+void RegisterPage::handleRegisterModule(ReqId id, const std::string &res, ErrorCode code)
 {
     if (code != ErrorCode::SUCCESS)
     {

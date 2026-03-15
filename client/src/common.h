@@ -2,18 +2,20 @@
 #include <QString>
 enum class ReqId
 {
-    ID_GET_VERIFY_CODE = 1001,
-    ID_REG_USER = 1002,
-    ID_RESET_PASSWORD = 1003,
-    ID_LOGIN_USER = 1004
+    ID_GET_VERIFY_CODE = 1001, // 获取验证码
+    ID_REG_USER = 1002,        // 注册用户
+    ID_RESET_PASSWORD = 1003,  // 重置密码
+    ID_LOGIN_USER = 1004,      // 用户登录
+    ID_CHAT_LOGIN = 1005,      // 聊天登录
+    ID_CHAT_LOGIN_RSP = 1006   // 聊天登录响应
 
 };
 
 enum class Modules
 {
-    REGISTER = 0,
-    RESET = 1,
-    LOGIN = 2
+    REGISTER = 0, // 注册
+    RESET = 1,    // 重置
+    LOGIN = 2     // 登录
 };
 
 enum class ErrorCode

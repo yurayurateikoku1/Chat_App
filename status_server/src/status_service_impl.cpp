@@ -75,7 +75,10 @@ ChatServer StatusServiceImpl::getChatServer()
     auto min_server = chat_servers_.begin()->second;
     for (const auto &server : chat_servers_)
     {
-        min_server = server.second;
+        if (server.second.connect_count < min_server.connect_count)
+        {
+            min_server = server.second;
+        }
     }
     return min_server;
 }

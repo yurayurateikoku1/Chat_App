@@ -5,7 +5,7 @@
 ResetPage::ResetPage(QObject *parent)
 {
     initHttpHandler();
-    connect(HttpMgr::getInstance().get(), &HttpMgr::signResetModuleDone, this, &ResetPage::slotResetModuleDone);
+    connect(HttpMgr::getInstance().get(), &HttpMgr::signResetModuleDone, this, &ResetPage::handleResetModule);
 }
 
 Q_INVOKABLE void ResetPage::getVerifyCode(const QString &email)
@@ -71,7 +71,7 @@ void ResetPage::initHttpHandler()
                            }});
 }
 
-void ResetPage::slotResetModuleDone(ReqId id, const std::string &res, ErrorCode code)
+void ResetPage::handleResetModule(ReqId id, const std::string &res, ErrorCode code)
 {
     if (code != ErrorCode::SUCCESS)
     {
