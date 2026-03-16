@@ -5,10 +5,12 @@ import QtQuick.Layouts
 Item {
     id: root
 
-    property string message: ""
-    property string time: ""
-    property bool isSelf: false
-    property string avatarSource: ""
+    required property string message
+    required property string time
+    required property bool isSelf
+
+    // 头像：自己的为空（显示占位），对方的从联系人模型按当前会话uid查询
+    readonly property string avatarSource: isSelf ? "" : ChatPage.getAvatar(ChatPage.getCurrentUid)
 
     implicitHeight: bubble_layout.implicitHeight + 10
 
@@ -27,7 +29,7 @@ Item {
             width: 36
             height: 36
             radius: 18
-            color: root.isSelf ? Common.color6 : Common.color3
+            color: root.avatarSource !== "" ? "transparent" : (root.isSelf ? Common.color6 : Common.color3)
             clip: true
 
             Image {
@@ -35,10 +37,6 @@ Item {
                 source: root.avatarSource
                 visible: root.avatarSource !== ""
                 fillMode: Image.PreserveAspectCrop
-                layer.enabled: true
-                layer.effect: Item {
-                    // 圆形裁剪通过父级 clip + radius 实现
-                }
             }
 
             Label {

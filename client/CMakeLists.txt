@@ -16,12 +16,11 @@ qt_add_executable(appclient
     src/pages/reset_page.cpp     src/pages/reset_page.h
     src/http_mgr.cpp            src/http_mgr.h
     src/tcp_mgr.cpp             src/tcp_mgr.h
-    src/user_model.cpp            src/user_model.h
+    src/user_mgr.cpp            src/user_mgr.h
     src/pages/chat_page.cpp     src/pages/chat_page.h
     src/models/chat_message_model.cpp src/models/chat_message_model.h
     src/models/chat_list_model.cpp src/models/chat_list_model.h
-    src/models/contact_list_model.cpp src/models/contact_list_model.h
-    src/models/search_list_model.cpp src/models/search_list_model.h
+    src/models/user_list_model.cpp src/models/user_list_model.h
 )
 
 qt_add_resources(appclient "resources"
@@ -52,17 +51,18 @@ qt_add_qml_module(appclient
     URI client
     VERSION 1.0
     QML_FILES
-        src/pages/Main.qml         src/pages/Common.qml 
-        src/pages/LoginPageView.qml
-        src/pages/RegisterPageView.qml
-        src/pages/ResetPageView.qml
         src/components/TextFieldComp.qml src/components/ButtonComp.qml src/components/ToastComp.qml
-        src/components/TimerButtonComp.qml src/components/ToolButtonComp.qml
-        src/components/CompoundList.qml src/components/TextEditComp.qml src/components/ChatHeaderComp.qml
-        src/components/ChatList.qml src/components/SearchList.qml src/components/ContactList.qml
-        src/components/ChatBubbleComp.qml src/components/MessageWindowList.qml
-        src/components/SideBarComp.qml
-        src/pages/ChatPageView.qml
+        src/components/TimerButtonComp.qml src/components/ToolButtonComp.qml src/components/ChatHeaderComp.qml
+        src/components/ChatListItem.qml src/components/ContactListItem.qml src/components/TextEditComp.qml
+        src/components/ChatBubbleComp.qml
+        src/pages/Main.qml         src/pages/Common.qml 
+        src/pages/LoginPageView.qml         src/pages/RegisterPageView.qml         src/pages/ResetPageView.qml
+        src/pages/CompoundList.qml          src/pages/ChatList.qml src/pages/SearchList.qml src/pages/ContactList.qml
+        src/pages/MessageWindowList.qml src/pages/SideBarComp.qml
+        src/pages/ChatPageView.qml src/pages/ChatPageItem0.qml
+        src/pages/ContactDialog.qml
+        src/pages/AddUserDialog.qml
+                
 )
 
 set_target_properties(appclient PROPERTIES

@@ -12,6 +12,7 @@ Page {
     RowLayout {
         anchors.fill: parent
         spacing: 0
+        //侧边栏
         SideBarComp {
             id: side_bar
             Layout.preferredWidth: 80
@@ -22,11 +23,12 @@ Page {
             onSignToolButContactsClicked: compound_list.showView(2)
             // onSignToolButAvatarClicked: contact_list.showView(0)
         }
+        //搜索框和复合列表区域
         Pane {
             id: area0
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: 5
+            Layout.preferredWidth: 6
             spacing: 2
             background: Item {}
             ColumnLayout {
@@ -45,6 +47,13 @@ Page {
                                 side_bar.currentIndex = -1;
                             }
                         }
+                        onTextChanged: {
+                            if (text.length > 0) {
+                                compound_list.showView(0);
+                                side_bar.currentIndex = -1;
+                            }
+                            ChatPage.searchContacts(text);
+                        }
                     }
 
                     ToolButtonComp {
@@ -55,8 +64,9 @@ Page {
                             anchors.centerIn: parent
                             height: 25
                             width: 25
-                            source: "qrc:/assets/sousuo.png"
+                            source: "qrc:/assets/tianjiayonghu.png"
                         }
+                        onClicked: adduser_dialog.open()
                     }
                 }
 
@@ -64,91 +74,39 @@ Page {
                     id: compound_list
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    onSignContactClicked: (uid, name, avatarSource, online) => {
+                        contact_dialog.contactUid = uid;
+                        contact_dialog.contactName = name;
+                        contact_dialog.contactAvatar = avatarSource;
+                        contact_dialog.contactOnline = online;
+                        contact_dialog.open();
+                    }
                 }
             }
         }
-        Pane {
+
+        //聊天窗口区域
+        StackView {
             id: area1
             Layout.fillWidth: true
+            Layout.preferredWidth: 14
             Layout.fillHeight: true
-            Layout.preferredWidth: 15
-            background: Item {}
-
-            ColumnLayout {
-                anchors.fill: parent
-
-                ChatHeaderComp {
-                    id: chat_header
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 40
-                    Layout.maximumHeight: 40
-                    name: ""
-                    online: true
-                }
-
-                MessageWindowList {
-                    id: messagewindow_list
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    model: ChatPage.chatMessageModel
-                }
-
-                RowLayout {
-                    ToolButtonComp {
-                        id: toolbutton_emoji
-                        Layout.preferredWidth: 25
-                        Layout.preferredHeight: 25
-                        Image {
-                            anchors.centerIn: parent
-                            source: "qrc:/assets/kaixin.png"
-                            width: 25
-                            height: 25
-                        }
-                    }
-
-                    ToolButtonComp {
-                        id: toolbutton_upload
-                        Layout.preferredWidth: 25
-                        Layout.preferredHeight: 25
-                        Image {
-                            anchors.centerIn: parent
-                            source: "qrc:/assets/shangchuan.png"
-                            width: 25
-                            height: 25
-                        }
-                    }
-
-                    ToolButtonComp {
-                        id: toolbutton_share
-                        Layout.preferredWidth: 25
-                        Layout.preferredHeight: 25
-                        Image {
-                            anchors.centerIn: parent
-                            source: "qrc:/assets/fenxiang.png"
-                            width: 25
-                            height: 25
-                        }
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                    }
-                }
-                TextEditComp {
-                    id: text_edit
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 150
-                }
-                RowLayout {
-                    Item {
-                        Layout.fillWidth: true
-                    }
-                    ButtonComp {
-                        id: button_send
-                        text: "Send"
-                    }
-                }
-            }
+            initialItem: ChatPageItem0 {}
         }
+    }
+
+    Connections {
+        target: compound_list
+        function onSignAddUserClicked() {
+            adduser_dialog.open();
+        }
+    }
+
+    ContactDialog {
+        id: contact_dialog
+    }
+
+    AddUserDialog {
+        id: adduser_dialog
     }
 }

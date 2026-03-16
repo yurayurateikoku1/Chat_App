@@ -3,7 +3,7 @@
 #include <QAbstractSocket>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "user_model.h"
+#include "user_mgr.h"
 
 TCPMgr::TCPMgr()
     : flag_recv_pending_(false), host_(""), port_(0), data_len_(0), data_id_(0)
@@ -104,9 +104,9 @@ void TCPMgr::initHttpHandler()
                                    return;
                                }
 
-                               UserModel::getInstance().setUid(json_obj.value("uid").toInt());
-                               UserModel::getInstance().setName(json_obj.value("name").toString().toStdString());
-                               UserModel::getInstance().setToken(json_obj.value("token").toString().toStdString());
+                               UserMgr::getInstance().setUid(json_obj.value("uid").toInt());
+                               UserMgr::getInstance().setName(json_obj.value("name").toString().toStdString());
+                               UserMgr::getInstance().setToken(json_obj.value("token").toString().toStdString());
 
                                emit signLoginChatStatus(true);
                            }});

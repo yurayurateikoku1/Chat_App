@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 
+//预设颜色
 QtObject {
     readonly property color color0: "#ddd"
     readonly property color color1: "#f1f7ff"

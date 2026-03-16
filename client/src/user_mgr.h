@@ -1,14 +1,14 @@
 #pragma once
 #include <string>
-class UserModel
+class UserMgr
 {
 public:
-    static UserModel &getInstance()
+    static UserMgr &getInstance()
     {
-        static UserModel instance;
+        static UserMgr instance;
         return instance;
     }
-    ~UserModel();
+    ~UserMgr();
 
     void setName(const std::string &name)
     {
@@ -26,7 +26,7 @@ public:
     }
 
 private:
-    UserModel();
+    UserMgr();
     std::string name_;
     std::string token_;
     int uid_;

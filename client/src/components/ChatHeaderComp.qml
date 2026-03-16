@@ -5,8 +5,9 @@ import QtQuick.Layouts
 Item {
     id: root
 
-    property string name: ""
-    property bool online: false
+    property int uid: 0           //用户uid
+    property string name: ""        //用户姓名
+    property bool online: false     //用户是否在线
 
     ColumnLayout {
         anchors.centerIn: parent

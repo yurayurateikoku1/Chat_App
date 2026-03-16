@@ -3,6 +3,7 @@ import QtQuick.Controls
 
 Rectangle {
     id: root
+    property alias text: text_edit.text
     radius: 6
     border.width: 1
     border.color: text_edit.activeFocus ? Common.color11 : Common.color0

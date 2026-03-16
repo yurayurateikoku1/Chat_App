@@ -26,8 +26,6 @@ QVariant ChatMessageModel::data(const QModelIndex &index, int role) const
         return msg.time;
     case IsSelfRole:
         return msg.is_self;
-    case AvatarSourceRole:
-        return msg.avatar_source;
     }
     return {};
 }
@@ -37,14 +35,13 @@ QHash<int, QByteArray> ChatMessageModel::roleNames() const
     return {
         {MessageRole, "message"},
         {TimeRole, "time"},
-        {IsSelfRole, "isSelf"},
-        {AvatarSourceRole, "avatarSource"}};
+        {IsSelfRole, "isSelf"}};
 }
 
-void ChatMessageModel::addMessage(const QString &message, const QString &time, bool is_self, const QString &avatar_source)
+void ChatMessageModel::addMessage(const QString &message, const QString &time, bool is_self)
 {
     beginInsertRows(QModelIndex(), messages_.size(), messages_.size());
-    messages_.append({message, time, is_self, avatar_source});
+    messages_.append({message, time, is_self});
     endInsertRows();
 }
 
