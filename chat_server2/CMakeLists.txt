@@ -1,4 +1,4 @@
-project(chat_server LANGUAGES CXX)
+project(chat_server2 LANGUAGES CXX)
 
 List(PREPEND CMAKE_PREFIX_PATH
     "D:/C++Library/mysql-connector-c++-8.3.0-winx64"

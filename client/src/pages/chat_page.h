@@ -15,6 +15,8 @@ class ChatPage : public QObject
     Q_PROPERTY(ChatListModel *getChatListModel READ getChatListModel CONSTANT)
     Q_PROPERTY(UserListModel *getContactListModel READ getContactListModel CONSTANT)
     Q_PROPERTY(UserListModel *getSearchListModel READ getSearchListModel CONSTANT)
+    Q_PROPERTY(UserListModel *getFriendRequestListModel READ getFriendRequestListModel CONSTANT)
+
     Q_PROPERTY(int getCurrentUid READ getCurrentUid NOTIFY signCurrentUidChanged)
     Q_PROPERTY(QString getCurrentName READ getCurrentName NOTIFY signCurrentUidChanged)
 
@@ -45,11 +47,14 @@ public:
     Q_INVOKABLE void clearFoundUser();
     /// @brief 添加联系人
     Q_INVOKABLE void addUser2Contact(int uid);
+    /// @brief 清除好友请求
+    Q_INVOKABLE void clearFriendRequest(int uid);
 
     ChatMessageModel *getChatMessageModel() const;
     ChatListModel *getChatListModel() const;
     UserListModel *getContactListModel() const;
     UserListModel *getSearchListModel() const;
+    UserListModel *getFriendRequestListModel() const;
     int getCurrentUid() const;
     QString getCurrentName() const;
 
@@ -67,6 +72,7 @@ private:
     ChatListModel *chat_list_model_;
     UserListModel *contact_list_model_;
     UserListModel *search_list_model_;
+    UserListModel *friend_request_list_model_;
     ChatMessageModel *current_message_model_ = nullptr;
     int current_uid_ = -1;
 

@@ -43,6 +43,9 @@ public:
     ///@brief 根据uid查询名称
     Q_INVOKABLE QString getName(int uid) const;
 
+    ///@brief 根据uid移除用户
+    Q_INVOKABLE void removeUser(int uid);
+
     ///@brief 获取数量
     int count() const;
 

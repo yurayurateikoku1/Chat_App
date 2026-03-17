@@ -4,7 +4,8 @@ ChatPage::ChatPage(QObject *parent)
     : QObject(parent),
       chat_list_model_(new ChatListModel(this)),
       contact_list_model_(new UserListModel(this)),
-      search_list_model_(new UserListModel(this))
+      search_list_model_(new UserListModel(this)),
+      friend_request_list_model_(new UserListModel(this))
 {
     // 测试数据 - 联系人
     contact_list_model_->addUser(1, "小明", "qrc:/assets/avatars/Artboard_1.png", true, true);
@@ -15,6 +16,11 @@ ChatPage::ChatPage(QObject *parent)
     contact_list_model_->addUser(6, "赵六", "qrc:/assets/avatars/Artboard_6.png", false, true);
     contact_list_model_->addUser(7, "孙七", "qrc:/assets/avatars/Artboard_7.png", true, true);
     contact_list_model_->addUser(8, "周八", "qrc:/assets/avatars/Artboard_8.png", false, true);
+
+    // 测试数据 - 好友请求
+    friend_request_list_model_->addUser(9, "刘九", "qrc:/assets/avatars/Artboard_1.png", true, false);
+    friend_request_list_model_->addUser(10, "吴十", "qrc:/assets/avatars/Artboard_2.png", false, false);
+    friend_request_list_model_->addUser(11, "陈十一", "", false, false);
 
     // 测试数据 - 会话及消息（头像从联系人模型自动查询）
     chat_list_model_->addChat(1, "小明", "在吗？", "10:30", contact_list_model_->getAvatar(1), 2);
@@ -143,6 +149,11 @@ Q_INVOKABLE void ChatPage::addUser2Contact(int uid)
     // TODO: 替换为实际的服务器请求
 }
 
+Q_INVOKABLE void ChatPage::clearFriendRequest(int uid)
+{
+    friend_request_list_model_->removeUser(uid);
+}
+
 ChatMessageModel *ChatPage::getChatMessageModel() const
 {
     return current_message_model_;
@@ -161,6 +172,11 @@ UserListModel *ChatPage::getContactListModel() const
 UserListModel *ChatPage::getSearchListModel() const
 {
     return search_list_model_;
+}
+
+UserListModel *ChatPage::getFriendRequestListModel() const
+{
+    return friend_request_list_model_;
 }
 
 int ChatPage::getCurrentUid() const

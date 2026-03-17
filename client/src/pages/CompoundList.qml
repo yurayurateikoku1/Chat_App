@@ -11,8 +11,8 @@ Rectangle {
     property int currentView: -1
 
     signal signContactClicked(int uid, string name, string avatarSource, bool online)
-    signal signAddUserClicked
-
+    signal signButtonAddUserClicked
+    signal signButtonFriendRequestClicked
     function showView(index) {
         currentView = index;
     }
@@ -25,7 +25,7 @@ Rectangle {
                 id: button_adduser
                 text: "Add User"
                 Layout.fillWidth: true
-                onClicked: root.signAddUserClicked()
+                onClicked: root.signButtonAddUserClicked()
             }
             SearchList {
                 id: searchuesr_list
@@ -36,12 +36,24 @@ Rectangle {
         }
     }
 
-    ContactList {
-        id: contact_list
+    Item {
         anchors.fill: parent
-        anchors.margins: 5
         visible: root.currentView === 2
-        onSignContactClicked: (uid, name, avatarSource, online) => root.signContactClicked(uid, name, avatarSource, online)
+        ColumnLayout {
+            anchors.fill: parent
+            ButtonComp {
+                id: button_friendrequest
+                text: "Friend request"
+                Layout.fillWidth: true
+                onClicked: root.signButtonFriendRequestClicked()
+            }
+            ContactList {
+                id: contact_list
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onSignContactClicked: (uid, name, avatarSource, online) => root.signContactClicked(uid, name, avatarSource, online)
+            }
+        }
     }
 
     ChatList {

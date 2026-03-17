@@ -91,6 +91,21 @@ QString UserListModel::getName(int uid) const
     return {};
 }
 
+void UserListModel::removeUser(int uid)
+{
+    for (int i = 0; i < users_.size(); ++i)
+    {
+        if (users_.at(i).uid == uid)
+        {
+            beginRemoveRows(QModelIndex(), i, i);
+            users_.removeAt(i);
+            endRemoveRows();
+            emit countChanged();
+            return;
+        }
+    }
+}
+
 int UserListModel::count() const
 {
     return users_.size();

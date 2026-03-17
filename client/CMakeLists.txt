@@ -29,7 +29,7 @@ qt_add_resources(appclient "resources"
         assets/chat.png assets/kejianxing-bukejian.png assets/kejianxing-kejian.png
         assets/duihuaxinxi.png assets/fenxiang.png assets/kaixin.png
         assets/shangchuan.png assets/sousuo.png assets/tianjiayonghu.png
-        assets/tongxunlu.png
+        assets/tongxunlu.png assets/agree.png assets/disagree.png
         assets/avatars/Artboard_0.png
         assets/avatars/Artboard_1.png assets/avatars/Artboard_2.png assets/avatars/Artboard_3.png
         assets/avatars/Artboard_4.png assets/avatars/Artboard_5.png assets/avatars/Artboard_6.png
@@ -54,14 +54,14 @@ qt_add_qml_module(appclient
         src/components/TextFieldComp.qml src/components/ButtonComp.qml src/components/ToastComp.qml
         src/components/TimerButtonComp.qml src/components/ToolButtonComp.qml src/components/ChatHeaderComp.qml
         src/components/ChatListItem.qml src/components/ContactListItem.qml src/components/TextEditComp.qml
-        src/components/ChatBubbleComp.qml
+        src/components/ChatBubbleComp.qml src/components/FriendRequestListItem.qml
         src/pages/Main.qml         src/pages/Common.qml 
         src/pages/LoginPageView.qml         src/pages/RegisterPageView.qml         src/pages/ResetPageView.qml
         src/pages/CompoundList.qml          src/pages/ChatList.qml src/pages/SearchList.qml src/pages/ContactList.qml
         src/pages/MessageWindowList.qml src/pages/SideBarComp.qml
         src/pages/ChatPageView.qml src/pages/ChatPageItem0.qml
-        src/pages/ContactDialog.qml
-        src/pages/AddUserDialog.qml
+        src/pages/ContactDialog.qml src/pages/FriendRequestList.qml
+        src/pages/AddUserDialog.qml 
                 
 )
 

@@ -47,5 +47,7 @@
         <file>assets/avatars/Artboard_33.png</file>
         <file>assets/avatars/Artboard_34.png</file>
         <file>assets/avatars/Artboard_35.png</file>
+        <file>assets/agree.png</file>
+        <file>assets/disagree.png</file>
     </qresource>
 </RCC>

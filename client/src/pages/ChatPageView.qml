@@ -19,7 +19,10 @@ Page {
             Layout.minimumWidth: 80
             Layout.maximumWidth: 80
             Layout.fillHeight: true
-            onSignToolButChatClicked: compound_list.showView(1)
+            onSignToolButChatClicked: {
+                compound_list.showView(1);
+                area1.pop(null);
+            }
             onSignToolButContactsClicked: compound_list.showView(2)
             // onSignToolButAvatarClicked: contact_list.showView(0)
         }
@@ -92,13 +95,22 @@ Page {
             Layout.preferredWidth: 14
             Layout.fillHeight: true
             initialItem: ChatPageItem0 {}
+
+            Component {
+                id: friend_request
+                FriendRequestList {}
+            }
         }
     }
 
     Connections {
         target: compound_list
-        function onSignAddUserClicked() {
+        function onSignButtonAddUserClicked() {
             adduser_dialog.open();
+        }
+
+        function onSignButtonFriendRequestClicked() {
+            area1.push(friend_request);
         }
     }
 
