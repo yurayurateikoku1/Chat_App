@@ -7,7 +7,7 @@ Rectangle {
 
     required property int uid
     required property string name
-    required property string avatarSource
+    required property string icon
 
     signal signToolButnAgreeClicked(int uid)
     signal signToolButnDisAgreeClicked(int uid)
@@ -33,8 +33,8 @@ Rectangle {
             radius: 4
             Image {
                 anchors.fill: parent
-                source: root.avatarSource
-                visible: root.avatarSource !== ""
+                source: root.icon
+                visible: root.icon !== ""
                 fillMode: Image.PreserveAspectCrop
             }
 
@@ -43,7 +43,7 @@ Rectangle {
                 text: root.name.charAt(0)
                 font.pixelSize: 16
                 color: "white"
-                visible: root.avatarSource === ""
+                visible: root.icon === ""
             }
         }
 

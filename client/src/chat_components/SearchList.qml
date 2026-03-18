@@ -7,11 +7,11 @@ import QtQuick.Layouts
 ListView {
     id: root
 
-    signal signContactClicked(int uid, string name, string avatarSource, bool online)
+    signal signContactClicked(int uid, string name, string icon, bool online)
 
     clip: true
     spacing: 2
-    model: ChatPage.getContactListModel
+    model: ChatPage.getSearchListModel
 
     ScrollBar.vertical: ScrollBar {
         policy: ScrollBar.AsNeeded
@@ -19,6 +19,6 @@ ListView {
 
     delegate: ContactListItem {
         width: ListView.view.width
-        onSignClicked: (uid, name, avatarSource, online) => root.signContactClicked(uid, name, avatarSource, online)
+        onSignClicked: (uid, name, icon, online) => root.signContactClicked(uid, name, icon, online)
     }
 }

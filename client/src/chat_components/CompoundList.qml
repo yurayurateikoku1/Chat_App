@@ -10,7 +10,7 @@ Rectangle {
     // 0=添加用户, 1=聊天列表, 2=通讯录
     property int currentView: -1
 
-    signal signContactClicked(int uid, string name, string avatarSource, bool online)
+    signal signContactClicked(int uid, string name, string icon, bool online)
     signal signButtonAddUserClicked
     signal signButtonFriendRequestClicked
     function showView(index) {
@@ -31,7 +31,7 @@ Rectangle {
                 id: searchuesr_list
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                onSignContactClicked: (uid, name, avatarSource, online) => root.signContactClicked(uid, name, avatarSource, online)
+                onSignContactClicked: (uid, name, icon, online) => root.signContactClicked(uid, name, icon, online)
             }
         }
     }
@@ -51,7 +51,7 @@ Rectangle {
                 id: contact_list
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                onSignContactClicked: (uid, name, avatarSource, online) => root.signContactClicked(uid, name, avatarSource, online)
+                onSignContactClicked: (uid, name, icon, online) => root.signContactClicked(uid, name, icon, online)
             }
         }
     }

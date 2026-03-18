@@ -58,6 +58,7 @@ ApplicationWindow {
         target: LoginPage
         function onSign2UILoginStatus(status) {
             login_page.button_login.enabled = true;
+            if (!status) return;
             main_window.width = 1024;
             main_window.height = 700;
             main_window.x = (Screen.width - main_window.width) / 2;

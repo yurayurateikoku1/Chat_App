@@ -74,40 +74,127 @@ void LogicSystem::dealMessage()
 void LogicSystem::registerCallBacks()
 {
     callBacks_.insert({static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN), std::bind(&LogicSystem::loginHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
+
+    callBacks_.insert({static_cast<short>(MSG_IDS::ID_SEARCH_USER_REQ), std::bind(&LogicSystem::searchUserHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
 }
 
 void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
 {
-    try {
+    try
+    {
+        nlohmann::json root = nlohmann::json::parse(msg_data);
+        nlohmann::json return_root;
+        auto uid = root["uid"].get<int>();
+        auto token = root["token"].get<std::string>();
+        SPDLOG_INFO("uid:{},token:{}", uid, token);
+
+        Defer defer([this, &return_root, session]()
+                    {
+        std::string msg = return_root.dump();
+        SPDLOG_INFO("Sending response: {}", msg);
+        session->send(msg,static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN_RSP)); });
+
+        // 从redis查看用户token是否正确
+        std::string uid_str = std::to_string(uid);
+        std::string token_key = USERTOKENPREFIX + uid_str;
+        std::string token_value = "";
+        bool ret = RedisMgr::getInstance().getValue(token_key, token_value);
+        if (!ret)
+        {
+            return_root["error"] = ErrorCode::UIDINVALID;
+            return;
+        }
+
+        std::string base_key = USER_BASE_INFO + uid_str;
+        auto user_info = std::make_shared<UserInfo>();
+        bool ret_base = getBaseInfo(base_key, uid, user_info);
+
+        return_root["uid"] = uid;
+        return_root["passwd"] = user_info->passwd;
+        return_root["username"] = user_info->name;
+        return_root["email"] = user_info->email;
+        return_root["nick"] = user_info->nick;
+        return_root["desc"] = user_info->desc;
+        return_root["sex"] = user_info->sex;
+        return_root["icon"] = user_info->icon;
+        return_root["error"] = 0;
+        // 从数据库获取申请列表
+        // 获取好友列表
+
+        auto server_name = ConfigMgr::getInstance()["self_server"]["name"];
+        // 增加登录数量
+        auto rd_res = RedisMgr::getInstance().hgetValue(LOGIN_COUNT, server_name);
+        int count = 0;
+        if (!rd_res.empty())
+        {
+            count = std::stoi(rd_res);
+        }
+        count++;
+        auto count_str = std::to_string(count);
+        RedisMgr::getInstance().hsetValue(LOGIN_COUNT, server_name, count_str);
+
+        //
+        session->setUid(uid);
+        std::string ip_key = USERIPPREFIX + uid_str;
+        RedisMgr::getInstance().setValue(ip_key, server_name);
+        UserMgr::getInstance().setUserSession(uid, session);
+    }
+    catch (const std::exception &e)
+    {
+        SPDLOG_ERROR("loginHandler exception: {}", e.what());
+    }
+}
+
+void LogicSystem::searchUserHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
+{
     nlohmann::json root = nlohmann::json::parse(msg_data);
     nlohmann::json return_root;
     auto uid = root["uid"].get<int>();
-    auto token = root["token"].get<std::string>();
-    SPDLOG_INFO("uid:{},token:{}", uid, token);
 
     Defer defer([this, &return_root, session]()
                 {
         std::string msg = return_root.dump();
         SPDLOG_INFO("Sending response: {}", msg);
-        session->send(msg,static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN_RSP)); });
+        session->send(msg,static_cast<short>(MSG_IDS::ID_SEARCH_USER_RSP)); });
 
-    // 从redis查看用户token是否正确
-    std::string uid_str = std::to_string(uid);
-    std::string token_key = USERTOKENPREFIX + uid_str;
-    std::string token_value = "";
-    bool ret = RedisMgr::getInstance().getValue(token_key, token_value);
-    if (!ret)
+    auto uid_str = std::to_string(uid);
+    std::string base_key = USER_BASE_INFO + uid_str;
+    std::string string_info = "";
+    auto user_info = std::make_shared<UserInfo>();
+    bool ret_base = RedisMgr::getInstance().getValue(base_key, string_info);
+    if (ret_base)
+    {
+        nlohmann::json redis_root = nlohmann::json::parse(string_info);
+        return_root["uid"] = redis_root["uid"].get<int>();
+        return_root["username"] = redis_root["username"].get<std::string>();
+        return_root["email"] = redis_root["email"].get<std::string>();
+        return_root["nick"] = redis_root["nick"].get<std::string>();
+        return_root["desc"] = redis_root["desc"].get<std::string>();
+        return_root["sex"] = redis_root["sex"].get<int>();
+        return_root["icon"] = redis_root["icon"].get<std::string>();
+        return_root["error"] = 0;
+
+        return;
+    }
+
+    user_info = MysqlMgr::getInstance().getUser(uid);
+    if (user_info == nullptr)
     {
         return_root["error"] = ErrorCode::UIDINVALID;
         return;
     }
 
-    std::string base_key = USER_BASE_INFO + uid_str;
-    auto user_info = std::make_shared<UserInfo>();
-    bool ret_base = getBaseInfo(base_key, uid, user_info);
+    nlohmann::json redis_root;
+    redis_root["uid"] = user_info->uid;
+    redis_root["username"] = user_info->name;
+    redis_root["email"] = user_info->email;
+    redis_root["nick"] = user_info->nick;
+    redis_root["desc"] = user_info->desc;
+    redis_root["sex"] = user_info->sex;
+    redis_root["icon"] = user_info->icon;
+    RedisMgr::getInstance().setValue(base_key, return_root.dump());
 
-    return_root["uid"] = uid;
-    return_root["passwd"] = user_info->passwd;
+    return_root["uid"] = user_info->uid;
     return_root["username"] = user_info->name;
     return_root["email"] = user_info->email;
     return_root["nick"] = user_info->nick;
@@ -115,29 +202,6 @@ void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, 
     return_root["sex"] = user_info->sex;
     return_root["icon"] = user_info->icon;
     return_root["error"] = 0;
-    // 从数据库获取申请列表
-    // 获取好友列表
-
-    auto server_name = ConfigMgr::getInstance()["self_server"]["name"];
-    // 增加登录数量
-    auto rd_res = RedisMgr::getInstance().hgetValue(LOGIN_COUNT, server_name);
-    int count = 0;
-    if (!rd_res.empty())
-    {
-        count = std::stoi(rd_res);
-    }
-    count++;
-    auto count_str = std::to_string(count);
-    RedisMgr::getInstance().hsetValue(LOGIN_COUNT, server_name, count_str);
-
-    //
-    session->setUid(uid);
-    std::string ip_key = USERIPPREFIX + uid_str;
-    RedisMgr::getInstance().setValue(ip_key, server_name);
-    UserMgr::getInstance().setUserSession(uid, session);
-    } catch (const std::exception &e) {
-        SPDLOG_ERROR("loginHandler exception: {}", e.what());
-    }
 }
 
 bool LogicSystem::getBaseInfo(const std::string &base_key, int uid, std::shared_ptr<UserInfo> &user_info)
@@ -148,7 +212,7 @@ bool LogicSystem::getBaseInfo(const std::string &base_key, int uid, std::shared_
     {
         nlohmann::json root = nlohmann::json::parse(string_info);
         user_info->uid = root["uid"].get<int>();
-        user_info->name = root["name"].get<std::string>();
+        user_info->name = root["username"].get<std::string>();
         user_info->passwd = root["passwd"].get<std::string>();
         user_info->email = root["email"].get<std::string>();
         user_info->nick = root["nick"].get<std::string>();
@@ -169,7 +233,7 @@ bool LogicSystem::getBaseInfo(const std::string &base_key, int uid, std::shared_
 
         nlohmann::json redis_root;
         redis_root["uid"] = user_info->uid;
-        redis_root["name"] = user_info->name;
+        redis_root["username"] = user_info->name;
         redis_root["passwd"] = user_info->passwd;
         redis_root["email"] = user_info->email;
         redis_root["nick"] = user_info->nick;

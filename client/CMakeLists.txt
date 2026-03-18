@@ -21,6 +21,7 @@ qt_add_executable(appclient
     src/models/chat_message_model.cpp src/models/chat_message_model.h
     src/models/chat_list_model.cpp src/models/chat_list_model.h
     src/models/user_list_model.cpp src/models/user_list_model.h
+    src/models/user_item.h
 )
 
 qt_add_resources(appclient "resources"
@@ -51,17 +52,21 @@ qt_add_qml_module(appclient
     URI client
     VERSION 1.0
     QML_FILES
-        src/components/TextFieldComp.qml src/components/ButtonComp.qml src/components/ToastComp.qml
-        src/components/TimerButtonComp.qml src/components/ToolButtonComp.qml src/components/ChatHeaderComp.qml
-        src/components/ChatListItem.qml src/components/ContactListItem.qml src/components/TextEditComp.qml
-        src/components/ChatBubbleComp.qml src/components/FriendRequestListItem.qml
-        src/pages/Main.qml         src/pages/Common.qml 
+        src/base_components/TextFieldComp.qml src/base_components/ButtonComp.qml src/base_components/ToastComp.qml
+        src/base_components/TimerButtonComp.qml src/base_components/ToolButtonComp.qml src/base_components/ChatHeaderComp.qml
+        src/base_components/ChatListItem.qml src/base_components/ContactListItem.qml src/base_components/TextEditComp.qml
+        src/base_components/ChatBubbleComp.qml src/base_components/FriendRequestListItem.qml
+        
+        src/chat_components/CompoundList.qml          src/chat_components/ChatList.qml 
+        src/chat_components/MessageWindowList.qml  src/chat_components/SideBarComp.qml
+           src/chat_components/ChatPageItem0.qml
+        src/chat_components/ContactDialog.qml  src/chat_components/FriendRequestList.qml
+        src/chat_components/AddUserDialog.qml src/chat_components/ContactList.qml
+        src/chat_components/SearchList.qml 
+        
+        src/pages/Main.qml         src/pages/Common.qml src/pages/ChatPageView.qml
         src/pages/LoginPageView.qml         src/pages/RegisterPageView.qml         src/pages/ResetPageView.qml
-        src/pages/CompoundList.qml          src/pages/ChatList.qml src/pages/SearchList.qml src/pages/ContactList.qml
-        src/pages/MessageWindowList.qml src/pages/SideBarComp.qml
-        src/pages/ChatPageView.qml src/pages/ChatPageItem0.qml
-        src/pages/ContactDialog.qml src/pages/FriendRequestList.qml
-        src/pages/AddUserDialog.qml 
+
                 
 )
 

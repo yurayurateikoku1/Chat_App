@@ -10,7 +10,7 @@ Item {
     required property bool isSelf
 
     // 头像：自己的为空（显示占位），对方的从联系人模型按当前会话uid查询
-    readonly property string avatarSource: isSelf ? "" : ChatPage.getAvatar(ChatPage.getCurrentUid)
+    readonly property string icon: isSelf ? "" : ChatPage.getAvatar(ChatPage.getCurrentUid)
 
     implicitHeight: bubble_layout.implicitHeight + 10
 
@@ -29,13 +29,13 @@ Item {
             width: 36
             height: 36
             radius: 18
-            color: root.avatarSource !== "" ? "transparent" : (root.isSelf ? Common.color6 : Common.color3)
+            color: root.icon !== "" ? "transparent" : (root.isSelf ? Common.color6 : Common.color3)
             clip: true
 
             Image {
                 anchors.fill: parent
-                source: root.avatarSource
-                visible: root.avatarSource !== ""
+                source: root.icon
+                visible: root.icon !== ""
                 fillMode: Image.PreserveAspectCrop
             }
 
@@ -44,7 +44,7 @@ Item {
                 text: root.isSelf ? "Me" : "Ta"
                 font.pixelSize: 12
                 color: "white"
-                visible: root.avatarSource === ""
+                visible: root.icon === ""
             }
         }
 

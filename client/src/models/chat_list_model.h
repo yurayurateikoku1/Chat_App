@@ -18,10 +18,10 @@ public:
     {
         UidRole = Qt::UserRole + 1,
         NameRole,
-        LastMessageRole,
+        IconRole,
+        LastMsgRole,
         TimeRole,
-        AvatarSourceRole,
-        UnreadCountRole
+        UnreadCntRole
     };
 
     explicit ChatListModel(QObject *parent = nullptr);
@@ -34,9 +34,7 @@ public:
     bool loading() const;
 
     ///@brief 添加一个聊天会话
-    Q_INVOKABLE void addChat(int uid, const QString &name, const QString &last_message,
-                             const QString &time, const QString &avatar_source = "",
-                             int unread_count = 0);
+    void addChat(std::shared_ptr<FriendInfo> friend_info);
 
     ///@brief 清空所有会话
     Q_INVOKABLE void clearChats();
@@ -69,7 +67,7 @@ signals:
 private:
     struct ChatEntry
     {
-        UserItem user;
+        std::shared_ptr<FriendInfo> user;
         ChatMessageModel *message_model = nullptr;
     };
 

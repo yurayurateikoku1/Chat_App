@@ -21,17 +21,17 @@ QVariant ChatListModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
     case UidRole:
-        return entry.user.uid;
+        return entry.user->uid;
     case NameRole:
-        return entry.user.name;
-    case LastMessageRole:
-        return entry.user.last_message;
+        return entry.user->name;
+    case IconRole:
+        return entry.user->icon;
+    case LastMsgRole:
+        return entry.user->last_msg;
     case TimeRole:
-        return entry.user.time;
-    case AvatarSourceRole:
-        return entry.user.avatar_source;
-    case UnreadCountRole:
-        return entry.user.unread_count;
+        return entry.user->time;
+    case UnreadCntRole:
+        return entry.user->unread_cnt;
     }
     return {};
 }
@@ -41,20 +41,17 @@ QHash<int, QByteArray> ChatListModel::roleNames() const
     return {
         {UidRole, "uid"},
         {NameRole, "name"},
-        {LastMessageRole, "lastMessage"},
+        {IconRole, "icon"},
+        {LastMsgRole, "lastMsg"},
         {TimeRole, "time"},
-        {AvatarSourceRole, "avatarSource"},
-        {UnreadCountRole, "unreadCount"}};
+        {UnreadCntRole, "unreadCnt"}};
 }
 
-void ChatListModel::addChat(int uid, const QString &name, const QString &last_message,
-                            const QString &time, const QString &avatar_source,
-                            int unread_count)
+void ChatListModel::addChat(std::shared_ptr<FriendInfo> friend_info)
 {
     beginInsertRows(QModelIndex(), chats_.size(), chats_.size());
-    UserItem user{uid, name, avatar_source, false, false, last_message, time, unread_count};
     auto *msg_model = new ChatMessageModel(this);
-    chats_.append({user, msg_model});
+    chats_.append({friend_info, msg_model});
     endInsertRows();
 }
 
@@ -98,8 +95,8 @@ QString ChatListModel::getNameByUid(int uid) const
 {
     for (const auto &entry : chats_)
     {
-        if (entry.user.uid == uid)
-            return entry.user.name;
+        if (entry.user->uid == uid)
+            return entry.user->name;
     }
     return {};
 }
@@ -108,7 +105,7 @@ bool ChatListModel::hasChat(int uid) const
 {
     for (const auto &entry : chats_)
     {
-        if (entry.user.uid == uid)
+        if (entry.user->uid == uid)
             return true;
     }
     return false;
@@ -118,7 +115,7 @@ ChatMessageModel *ChatListModel::getMessageModel(int uid)
 {
     for (auto &entry : chats_)
     {
-        if (entry.user.uid == uid)
+        if (entry.user->uid == uid)
             return entry.message_model;
     }
     return nullptr;
@@ -128,11 +125,11 @@ void ChatListModel::incrementUnread(int uid)
 {
     for (int i = 0; i < chats_.size(); ++i)
     {
-        if (chats_[i].user.uid == uid)
+        if (chats_[i].user->uid == uid)
         {
-            chats_[i].user.unread_count++;
+            chats_[i].user->unread_cnt++;
             auto idx = index(i);
-            emit dataChanged(idx, idx, {UnreadCountRole});
+            emit dataChanged(idx, idx, {UnreadCntRole});
             return;
         }
     }
@@ -142,13 +139,13 @@ void ChatListModel::clearUnread(int uid)
 {
     for (int i = 0; i < chats_.size(); ++i)
     {
-        if (chats_[i].user.uid == uid)
+        if (chats_[i].user->uid == uid)
         {
-            if (chats_[i].user.unread_count == 0)
+            if (chats_[i].user->unread_cnt == 0)
                 return;
-            chats_[i].user.unread_count = 0;
+            chats_[i].user->unread_cnt = 0;
             auto idx = index(i);
-            emit dataChanged(idx, idx, {UnreadCountRole});
+            emit dataChanged(idx, idx, {UnreadCntRole});
             return;
         }
     }
@@ -158,7 +155,7 @@ void ChatListModel::removeChat(int uid)
 {
     for (int i = 0; i < chats_.size(); ++i)
     {
-        if (chats_[i].user.uid == uid)
+        if (chats_[i].user->uid == uid)
         {
             beginRemoveRows(QModelIndex(), i, i);
             delete chats_[i].message_model;

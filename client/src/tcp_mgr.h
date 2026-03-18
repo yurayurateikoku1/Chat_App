@@ -2,6 +2,7 @@
 #include "singleton.h"
 #include <QTCPSocket>
 #include "common.h"
+#include "models/user_item.h"
 #include <QObject>
 #include <QThread>
 #include <functional>
@@ -44,4 +45,7 @@ signals:
     /// @brief 发送聊天登录状态
     /// @param status
     void signLoginChatStatus(bool status);
+
+    /// @brief 发送搜索用户结果
+    void signSearchUserResult(std::shared_ptr<SearchInfo> info);
 };

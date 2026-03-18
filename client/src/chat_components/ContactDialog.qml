@@ -14,7 +14,7 @@ Dialog {
 
     property int contactUid: -1
     property string contactName: ""
-    property string contactAvatar: ""
+    property string contactIcon: ""
     property bool contactOnline: false
 
     // 圆角无边框背景
@@ -44,8 +44,8 @@ Dialog {
 
             Image {
                 anchors.fill: parent
-                source: root.contactAvatar
-                visible: root.contactAvatar !== ""
+                source: root.contactIcon
+                visible: root.contactIcon !== ""
                 fillMode: Image.PreserveAspectCrop
             }
 
@@ -54,7 +54,7 @@ Dialog {
                 text: root.contactName.charAt(0)
                 font.pixelSize: 24
                 color: "white"
-                visible: root.contactAvatar === ""
+                visible: root.contactIcon === ""
             }
         }
 

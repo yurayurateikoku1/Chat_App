@@ -21,15 +21,23 @@ QVariant UserListModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
     case UidRole:
-        return user.uid;
+        return user->uid;
     case NameRole:
-        return user.name;
-    case AvatarSourceRole:
-        return user.avatar_source;
+        return user->name;
+    case NickRole:
+        return user->nick;
+    case IconRole:
+        return user->icon;
+    case SexRole:
+        return user->sex;
+    case DescRole:
+        return user->desc;
     case OnlineRole:
-        return user.online;
+        return user->is_online;
     case IsFriendRole:
-        return user.is_friend;
+        return user->is_friend;
+    case StatusRole:
+        return user->status;
     }
     return {};
 }
@@ -39,16 +47,19 @@ QHash<int, QByteArray> UserListModel::roleNames() const
     return {
         {UidRole, "uid"},
         {NameRole, "name"},
-        {AvatarSourceRole, "avatarSource"},
+        {NickRole, "nick"},
+        {IconRole, "icon"},
+        {SexRole, "sex"},
+        {DescRole, "desc"},
         {OnlineRole, "online"},
-        {IsFriendRole, "isFriend"}};
+        {IsFriendRole, "isFriend"},
+        {StatusRole, "status"}};
 }
 
-void UserListModel::addUser(int uid, const QString &name, const QString &avatar_source,
-                            bool online, bool is_friend)
+void UserListModel::addUser(std::shared_ptr<FriendInfo> friend_info)
 {
     beginInsertRows(QModelIndex(), users_.size(), users_.size());
-    users_.append({uid, name, avatar_source, online, is_friend});
+    users_.append(friend_info);
     endInsertRows();
     emit countChanged();
 }
@@ -65,8 +76,8 @@ bool UserListModel::getOnline(int uid) const
 {
     for (const auto &user : users_)
     {
-        if (user.uid == uid)
-            return user.online;
+        if (user->uid == uid)
+            return user->is_online;
     }
     return false;
 }
@@ -75,8 +86,8 @@ QString UserListModel::getAvatar(int uid) const
 {
     for (const auto &user : users_)
     {
-        if (user.uid == uid)
-            return user.avatar_source;
+        if (user->uid == uid)
+            return user->icon;
     }
     return {};
 }
@@ -85,8 +96,8 @@ QString UserListModel::getName(int uid) const
 {
     for (const auto &user : users_)
     {
-        if (user.uid == uid)
-            return user.name;
+        if (user->uid == uid)
+            return user->name;
     }
     return {};
 }
@@ -95,7 +106,7 @@ void UserListModel::removeUser(int uid)
 {
     for (int i = 0; i < users_.size(); ++i)
     {
-        if (users_.at(i).uid == uid)
+        if (users_.at(i)->uid == uid)
         {
             beginRemoveRows(QModelIndex(), i, i);
             users_.removeAt(i);
@@ -111,7 +122,7 @@ int UserListModel::count() const
     return users_.size();
 }
 
-const QList<UserItem> &UserListModel::getUsers() const
+const QList<std::shared_ptr<FriendInfo>> &UserListModel::getUsers() const
 {
     return users_;
 }

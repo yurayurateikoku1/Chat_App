@@ -3,7 +3,7 @@
 #include <QQmlEngine>
 #include "user_item.h"
 
-///@brief 通用用户列表模型，用于搜索结果和联系人列表
+///@brief 通用用户列表模型，用于联系人列表、搜索结果、好友申请列表
 class UserListModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -16,9 +16,13 @@ public:
     {
         UidRole = Qt::UserRole + 1,
         NameRole,
-        AvatarSourceRole,
+        NickRole,
+        IconRole,
+        SexRole,
+        DescRole,
         OnlineRole,
-        IsFriendRole
+        IsFriendRole,
+        StatusRole
     };
 
     explicit UserListModel(QObject *parent = nullptr);
@@ -27,9 +31,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    ///@brief 添加一个用户
-    Q_INVOKABLE void addUser(int uid, const QString &name, const QString &avatar_source = "",
-                             bool online = false, bool is_friend = false);
+    ///@brief 添加一个用户（FriendInfo）
+    void addUser(std::shared_ptr<FriendInfo> friend_info);
 
     ///@brief 清空列表
     Q_INVOKABLE void clearUsers();
@@ -50,11 +53,11 @@ public:
     int count() const;
 
     ///@brief 获取所有用户数据
-    const QList<UserItem> &getUsers() const;
+    const QList<std::shared_ptr<FriendInfo>> &getUsers() const;
 
 signals:
     void countChanged();
 
 private:
-    QList<UserItem> users_;
+    QList<std::shared_ptr<FriendInfo>> users_;
 };

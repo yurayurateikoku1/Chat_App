@@ -7,10 +7,10 @@ Rectangle {
 
     required property int uid
     required property string name
-    required property string lastMessage
+    required property string lastMsg
     required property string time
-    required property string avatarSource
-    required property int unreadCount
+    required property string icon
+    required property int unreadCnt
     signal signClicked
     signal signDeleteClicked(int uid)
 
@@ -97,8 +97,8 @@ Rectangle {
 
                 Image {
                     anchors.fill: parent
-                    source: root.avatarSource
-                    visible: root.avatarSource !== ""
+                    source: root.icon
+                    visible: root.icon !== ""
                     fillMode: Image.PreserveAspectCrop
                 }
 
@@ -107,7 +107,7 @@ Rectangle {
                     text: root.name.charAt(0)
                     font.pixelSize: 18
                     color: "white"
-                    visible: root.avatarSource === ""
+                    visible: root.icon === ""
                 }
             }
 
@@ -138,7 +138,7 @@ Rectangle {
                     Layout.fillWidth: true
 
                     Label {
-                        text: root.lastMessage
+                        text: root.lastMsg
                         font.pixelSize: 13
                         color: "gray"
                         elide: Text.ElideRight
@@ -151,11 +151,11 @@ Rectangle {
                         Layout.preferredHeight: 20
                         radius: 10
                         color: "#ff4444"
-                        visible: root.unreadCount > 0
+                        visible: root.unreadCnt > 0
 
                         Label {
                             anchors.centerIn: parent
-                            text: root.unreadCount > 99 ? "99+" : root.unreadCount
+                            text: root.unreadCnt > 99 ? "99+" : root.unreadCnt
                             font.pixelSize: 10
                             color: "white"
                         }

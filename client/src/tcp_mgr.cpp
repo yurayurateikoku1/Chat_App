@@ -100,15 +100,53 @@ void TCPMgr::initHttpHandler()
                                int erro_code = json_obj.value("error").toInt();
                                if (erro_code != 0)
                                {
+                                   SPDLOG_ERROR("Chat login failed, error code: {}", erro_code);
                                    emit signLoginChatStatus(false);
                                    return;
                                }
 
-                               UserMgr::getInstance().setUid(json_obj.value("uid").toInt());
-                               UserMgr::getInstance().setName(json_obj.value("name").toString().toStdString());
-                               UserMgr::getInstance().setToken(json_obj.value("token").toString().toStdString());
+                               auto uid = json_obj.value("uid").toInt();
+                               auto name = json_obj.value("username").toString();
+                               SPDLOG_INFO("Chat login success, uid: {}, name: {}", uid, name.toStdString());
+
+                               UserMgr::getInstance().setUid(uid);
+                               UserMgr::getInstance().setName(name);
+                               UserMgr::getInstance().setToken(json_obj.value("token").toString());
 
                                emit signLoginChatStatus(true);
+                           }});
+
+    // 搜索用户回包后处理
+    http_handlers_.insert({ReqId::ID_SEARCH_USER_RSP, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto search_info = std::make_shared<SearchInfo>(json_obj.value("uid").toInt(),
+                                                                               json_obj.value("username").toString(),
+                                                                               json_obj.value("nick").toString(),
+                                                                               json_obj.value("desc").toString(),
+                                                                               json_obj.value("sex").toInt(),
+                                                                               json_obj.value("icon").toString());
+                               emit signSearchUserResult(search_info);
                            }});
 }
 

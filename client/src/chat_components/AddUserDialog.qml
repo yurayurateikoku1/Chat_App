@@ -18,7 +18,7 @@ Dialog {
     onClosed: {
         uid_input.text = "";
         root.searched = false;
-        ChatPage.clearFoundUser();
+        ChatPage.clearSearchResult();
     }
 
     // 圆角无边框背景
@@ -75,7 +75,7 @@ Dialog {
         ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            visible: root.searched && ChatPage.foundValid
+            visible: root.searched && ChatPage.getSearchResult.valid
 
             // 头像
             Rectangle {
@@ -88,23 +88,23 @@ Dialog {
 
                 Image {
                     anchors.fill: parent
-                    source: ChatPage.foundAvatar
-                    visible: ChatPage.foundAvatar !== ""
+                    source: ChatPage.getSearchResult.icon
+                    visible: ChatPage.getSearchResult.icon !== ""
                     fillMode: Image.PreserveAspectCrop
                 }
 
                 Label {
                     anchors.centerIn: parent
-                    text: ChatPage.foundName.charAt(0)
+                    text: ChatPage.getSearchResult.name.charAt(0)
                     font.pixelSize: 24
                     color: "white"
-                    visible: ChatPage.foundAvatar === ""
+                    visible: ChatPage.getSearchResult.icon === ""
                 }
             }
 
             // 名称
             Label {
-                text: ChatPage.foundName
+                text: ChatPage.getSearchResult.name
                 font.pixelSize: 18
                 font.bold: true
                 Layout.alignment: Qt.AlignHCenter
@@ -115,7 +115,7 @@ Dialog {
                 text: "添加联系人"
                 Layout.alignment: Qt.AlignHCenter
                 onClicked: {
-                    ChatPage.addUser2Contact(ChatPage.foundUid);
+                    ChatPage.addUser2Contact(ChatPage.getSearchResult.uid);
                     root.close();
                 }
             }
@@ -132,7 +132,7 @@ Dialog {
         ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            visible: root.searched && !ChatPage.foundValid
+            visible: root.searched && !ChatPage.getSearchResult.valid
 
             // 未找到用户
             Label {

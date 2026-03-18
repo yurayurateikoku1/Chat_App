@@ -9,6 +9,17 @@ Page {
         color: "#ffffff"
     }
 
+    ToastComp {
+        id: toast
+    }
+
+    Connections {
+        target: ChatPage
+        function onSign2UIMessage(msg, normal) {
+            toast.showMessage(msg, normal ? "green" : "red");
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -77,10 +88,10 @@ Page {
                     id: compound_list
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    onSignContactClicked: (uid, name, avatarSource, online) => {
+                    onSignContactClicked: (uid, name, icon, online) => {
                         contact_dialog.contactUid = uid;
                         contact_dialog.contactName = name;
-                        contact_dialog.contactAvatar = avatarSource;
+                        contact_dialog.contactIcon = icon;
                         contact_dialog.contactOnline = online;
                         contact_dialog.open();
                     }
