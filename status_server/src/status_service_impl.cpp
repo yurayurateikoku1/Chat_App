@@ -4,6 +4,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include "config_mgr.h"
+#include "redis_mgr.h"
 std::string generateUniqueString()
 {
     // 创建uuid对象
@@ -16,18 +17,29 @@ std::string generateUniqueString()
 StatusServiceImpl::StatusServiceImpl()
 {
     auto &config_mgr = ConfigMgr::getInstance();
-    ChatServer chat_server;
-    chat_server.host = config_mgr["chat_server1"]["host"];
-    chat_server.port = config_mgr["chat_server1"]["port"];
-    chat_server.name = config_mgr["chat_server1"]["name"];
-    chat_server.connect_count = 0;
-    chat_servers_[chat_server.name] = chat_server;
+    auto server_list = config_mgr["chat_servers"]["name"];
 
-    chat_server.host = config_mgr["chat_server2"]["host"];
-    chat_server.port = config_mgr["chat_server2"]["port"];
-    chat_server.name = config_mgr["chat_server2"]["name"];
-    chat_server.connect_count = 0;
-    chat_servers_[chat_server.name] = chat_server;
+    std::vector<std::string> words;
+    std::stringstream ss(server_list);
+    std::string word;
+
+    while (std::getline(ss, word, ','))
+    {
+        words.push_back(word);
+    }
+
+    for (auto &word : words)
+    {
+        if (config_mgr[word]["name"].empty())
+        {
+            continue;
+        }
+        ChatServer server;
+        server.host = config_mgr[word]["host"];
+        server.port = config_mgr[word]["port"];
+        server.name = config_mgr[word]["name"];
+        chat_servers_[server.name] = server;
+    }
 }
 
 Status StatusServiceImpl::GetChatServer(ServerContext *context, const GetChatServerReq *request, GetChatServerRsp *response)
@@ -45,18 +57,23 @@ Status StatusServiceImpl::Login(ServerContext *context, const LoginReq *request,
 {
     auto uid = request->uid();
     auto token = request->token();
-    std::lock_guard<std::mutex> lock(token_mutex_);
-    auto it = tokens_.find(uid);
-    if (it == tokens_.end())
+
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    std::string token_value = "";
+    bool ret = RedisMgr::getInstance().getValue(token_key, token_value);
+    if (!ret)
     {
         response->set_error(static_cast<int32_t>(ErrorCode::UIDINVALID));
         return Status::OK;
     }
-    if (it->second != token)
+
+    if (token_value != token)
     {
         response->set_error(static_cast<int32_t>(ErrorCode::TOKENINVALID));
         return Status::OK;
     }
+
     response->set_error(static_cast<int32_t>(ErrorCode::SUCCESS));
     response->set_uid(uid);
     response->set_token(token);
@@ -65,20 +82,49 @@ Status StatusServiceImpl::Login(ServerContext *context, const LoginReq *request,
 
 void StatusServiceImpl::insertToken(const std::string &token, int uid)
 {
-    std::lock_guard<std::mutex> lock(token_mutex_);
-    tokens_[uid] = token;
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    RedisMgr::getInstance().setValue(token_key, token);
 }
 
 ChatServer StatusServiceImpl::getChatServer()
 {
     std::lock_guard<std::mutex> lock(server_mutex_);
     auto min_server = chat_servers_.begin()->second;
-    for (const auto &server : chat_servers_)
+
+    auto count_str = RedisMgr::getInstance().hgetValue(LOGIN_COUNT, min_server.name);
+
+    if (count_str.empty())
     {
+        min_server.connect_count = INT_MAX;
+    }
+    else
+    {
+        min_server.connect_count = std::stoi(count_str);
+    }
+
+    for (auto &server : chat_servers_)
+    {
+        if (server.second.name == min_server.name)
+        {
+            continue;
+        }
+
+        auto count_str = RedisMgr::getInstance().hgetValue(LOGIN_COUNT, server.second.name);
+        if (count_str.empty())
+        {
+            server.second.connect_count = INT_MAX;
+        }
+        else
+        {
+            server.second.connect_count = std::stoi(count_str);
+        }
+
         if (server.second.connect_count < min_server.connect_count)
         {
             min_server = server.second;
         }
     }
+
     return min_server;
 }

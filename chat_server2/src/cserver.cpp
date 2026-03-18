@@ -1,15 +1,23 @@
 #include "cserver.h"
 #include <spdlog/spdlog.h>
 #include "iocontext_pool.h"
+#include "user_mgr.h"
 CServer::CServer(boost::asio::io_context &io_context, unsigned short port)
     : io_context_(io_context), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)), socket_(io_context)
 {
 }
 
-void CServer::clearSession(const std::string &uid)
+void CServer::clearSession(const std::string &session_id)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    session_map_.erase(uid);
+    if (session_map_.find(session_id) != session_map_.end())
+    {
+        UserMgr::getInstance().removeUserSession(session_map_[session_id]->getUid());
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        session_map_.erase(session_id);
+    }
 }
 
 CServer::~CServer()
@@ -23,7 +31,7 @@ void CServer::handleAccept(std::shared_ptr<CSession> new_session, const boost::s
         SPDLOG_INFO("New connection accepted");
         new_session->lunchSession();
         std::lock_guard<std::mutex> lock(mutex_);
-        session_map_.insert({new_session->getUid(), new_session});
+        session_map_.insert({new_session->getSessionId(), new_session});
     }
     else
     {

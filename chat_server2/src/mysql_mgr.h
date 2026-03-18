@@ -9,6 +9,7 @@
 #include <jdbc/cppconn/statement.h>
 #include <jdbc/cppconn/resultset.h>
 #include <jdbc/cppconn/exception.h>
+#include "common.h"
 
 class SqlConnection
 {
@@ -45,14 +46,6 @@ private:
     std::mutex mutex_;
     std::condition_variable cv_;
     std::thread check_thread_;
-};
-
-struct UserInfo
-{
-    std::string name;
-    std::string passwd;
-    std::string email;
-    int uid;
 };
 
 class MysqlStore

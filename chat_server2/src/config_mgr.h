@@ -30,6 +30,15 @@ struct SectionInfo
         }
         return items_[key];
     }
+
+    std::string getValue(const std::string &key)
+    {
+        if (items_.find(key) == items_.end())
+        {
+            return "";
+        }
+        return items_[key];
+    }
 };
 
 class ConfigMgr
@@ -60,6 +69,8 @@ public:
 
         return config_sections_[section];
     }
+
+    std::string getValue(const std::string &section, const std::string &key);
 
 private:
     ConfigMgr();

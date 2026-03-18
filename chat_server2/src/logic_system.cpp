@@ -5,7 +5,9 @@
 #include "redis_mgr.h"
 #include "mysql_mgr.h"
 #include "msg_node.h"
+#include "common.h"
 #include "status_grpc_client.h"
+#include "user_mgr.h"
 
 LogicSystem::LogicSystem()
     : flag_stop_(false)
@@ -76,40 +78,105 @@ void LogicSystem::registerCallBacks()
 
 void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
 {
+    try {
     nlohmann::json root = nlohmann::json::parse(msg_data);
-    auto uid = root["uid"].get<int>();
-    SPDLOG_INFO("uid:{}", uid);
-    // 从状态服务器获取token匹配是否正确
-    SPDLOG_INFO("Calling StatusGrpcClient::login for uid:{}", uid);
-    auto respone = StatusGrpcClient::getInstance().login(uid, root["token"].get<std::string>());
-    SPDLOG_INFO("StatusGrpcClient::login returned, error:{}", respone.error());
     nlohmann::json return_root;
+    auto uid = root["uid"].get<int>();
+    auto token = root["token"].get<std::string>();
+    SPDLOG_INFO("uid:{},token:{}", uid, token);
+
     Defer defer([this, &return_root, session]()
                 {
         std::string msg = return_root.dump();
         SPDLOG_INFO("Sending response: {}", msg);
         session->send(msg,static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN_RSP)); });
 
-    return_root["root"] = respone.error();
-    if (respone.error() != 0)
+    // 从redis查看用户token是否正确
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    std::string token_value = "";
+    bool ret = RedisMgr::getInstance().getValue(token_key, token_value);
+    if (!ret)
     {
-        SPDLOG_ERROR("Login error: {}", respone.error());
+        return_root["error"] = ErrorCode::UIDINVALID;
         return;
     }
 
-    // 从数据查看是否存在该用户
-    std::shared_ptr<UserInfo> user_info = nullptr;
-    SPDLOG_INFO("Querying MySQL for uid:{}", uid);
-    user_info = MysqlMgr::getInstance().getUser(uid);
-    if (user_info == nullptr)
-    {
-        SPDLOG_ERROR("User not found for uid:{}", uid);
-        return_root["error"] = static_cast<int>(ErrorCode::UIDINVALID);
-        return;
-    }
-    SPDLOG_INFO("User found: name={}", user_info->name);
-    return_root["error"] = 0;
+    std::string base_key = USER_BASE_INFO + uid_str;
+    auto user_info = std::make_shared<UserInfo>();
+    bool ret_base = getBaseInfo(base_key, uid, user_info);
+
     return_root["uid"] = uid;
-    return_root["token"] = respone.token();
-    return_root["name"] = user_info->name;
+    return_root["passwd"] = user_info->passwd;
+    return_root["username"] = user_info->name;
+    return_root["email"] = user_info->email;
+    return_root["nick"] = user_info->nick;
+    return_root["desc"] = user_info->desc;
+    return_root["sex"] = user_info->sex;
+    return_root["icon"] = user_info->icon;
+    return_root["error"] = 0;
+    // 从数据库获取申请列表
+    // 获取好友列表
+
+    auto server_name = ConfigMgr::getInstance()["self_server"]["name"];
+    // 增加登录数量
+    auto rd_res = RedisMgr::getInstance().hgetValue(LOGIN_COUNT, server_name);
+    int count = 0;
+    if (!rd_res.empty())
+    {
+        count = std::stoi(rd_res);
+    }
+    count++;
+    auto count_str = std::to_string(count);
+    RedisMgr::getInstance().hsetValue(LOGIN_COUNT, server_name, count_str);
+
+    //
+    session->setUid(uid);
+    std::string ip_key = USERIPPREFIX + uid_str;
+    RedisMgr::getInstance().setValue(ip_key, server_name);
+    UserMgr::getInstance().setUserSession(uid, session);
+    } catch (const std::exception &e) {
+        SPDLOG_ERROR("loginHandler exception: {}", e.what());
+    }
+}
+
+bool LogicSystem::getBaseInfo(const std::string &base_key, int uid, std::shared_ptr<UserInfo> &user_info)
+{
+    std::string string_info = "";
+    bool ret = RedisMgr::getInstance().getValue(base_key, string_info);
+    if (ret)
+    {
+        nlohmann::json root = nlohmann::json::parse(string_info);
+        user_info->uid = root["uid"].get<int>();
+        user_info->name = root["name"].get<std::string>();
+        user_info->passwd = root["passwd"].get<std::string>();
+        user_info->email = root["email"].get<std::string>();
+        user_info->nick = root["nick"].get<std::string>();
+        user_info->desc = root["desc"].get<std::string>();
+        user_info->sex = root["sex"].get<int>();
+        user_info->icon = root["icon"].get<std::string>();
+    }
+    else
+    {
+        std::shared_ptr<UserInfo> mysql_info = nullptr;
+        mysql_info = MysqlMgr::getInstance().getUser(uid);
+        if (mysql_info == nullptr)
+        {
+            return false;
+        }
+
+        user_info = mysql_info;
+
+        nlohmann::json redis_root;
+        redis_root["uid"] = user_info->uid;
+        redis_root["name"] = user_info->name;
+        redis_root["passwd"] = user_info->passwd;
+        redis_root["email"] = user_info->email;
+        redis_root["nick"] = user_info->nick;
+        redis_root["desc"] = user_info->desc;
+        redis_root["sex"] = user_info->sex;
+        redis_root["icon"] = user_info->icon;
+        RedisMgr::getInstance().setValue(base_key, redis_root.dump());
+    }
+    return true;
 }

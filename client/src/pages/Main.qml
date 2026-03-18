@@ -4,21 +4,21 @@ import QtQuick.Window
 
 ApplicationWindow {
     id: main_window
-    // width: 400
-    // height: 600
-    width: 1024
-    height: 700
+    width: 400
+    height: 600
+    // width: 1024
+    // height: 700
     visible: true
     title: "Chat"
     StackView {
         id: stack_view
         anchors.fill: parent
-        // initialItem: LoginPageView {
-        //     id: login_page
-        // }
-        initialItem: ChatPageView {
-            id: chat_page
+        initialItem: LoginPageView {
+            id: login_page
         }
+        // initialItem: ChatPageView {
+        //     id: chat_page
+        // }
     }
 
     Component {
@@ -31,10 +31,10 @@ ApplicationWindow {
         ResetPageView {}
     }
 
-    // Component {
-    //     id: chat_page
-    //     ChatPageView {}
-    // }
+    Component {
+        id: chat_page
+        ChatPageView {}
+    }
 
     Connections {
         target: RegisterPage

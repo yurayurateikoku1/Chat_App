@@ -10,7 +10,7 @@ CSession::CSession(boost::asio::io_context &io_context, CServer *server)
     : socket_(io_context), server_(server), flag_close_(false), flag_head_parse(false)
 {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    uid_ = boost::uuids::to_string(uuid);
+    session_id_ = boost::uuids::to_string(uuid);
     recv_head_node_ = std::make_shared<MsgNode>(HEAD_TOTAL_LEN);
 }
 
@@ -85,7 +85,7 @@ bool CSession::parseHeader(int &copy_len, std::size_t &bytes_transferred)
     if (msg_id > MAX_LENGTH)
     {
         SPDLOG_ERROR("message id error");
-        server_->clearSession(uid_);
+        server_->clearSession(session_id_);
         return false;
     }
 
@@ -96,7 +96,7 @@ bool CSession::parseHeader(int &copy_len, std::size_t &bytes_transferred)
     if (msg_len > MAX_LENGTH)
     {
         SPDLOG_ERROR("message len error");
-        server_->clearSession(uid_);
+        server_->clearSession(session_id_);
         return false;
     }
 
@@ -138,7 +138,7 @@ void CSession::handleRead(const boost::system::error_code &ec, std::size_t bytes
         {
             SPDLOG_ERROR(ec.message());
             close();
-            server_->clearSession(uid_);
+            server_->clearSession(session_id_);
             return;
         }
 
@@ -198,7 +198,7 @@ void CSession::handleWrite(const boost::system::error_code &ec, std::size_t byte
         {
             SPDLOG_ERROR(ec.message());
             close();
-            server_->clearSession(uid_);
+            server_->clearSession(session_id_);
         }
     }
     catch (const std::exception &e)

@@ -12,7 +12,10 @@ public:
     ~CSession();
 
     boost::asio::ip::tcp::socket &getSocket() { return socket_; }
-    std::string getUid() { return uid_; }
+    std::string &getSessionId() { return session_id_; }
+    void setSessionId(std::string session_id) { session_id_ = session_id; }
+    void setUid(int uid) { user_uid_ = uid; }
+    int getUid() { return user_uid_; }
     void lunchSession();
     void close();
     void send(const std::string &message, short message_id);
@@ -27,7 +30,8 @@ private:
     bool parseBody(int &copy_len, std::size_t &bytes_transferred);
     CServer *server_;
     boost::asio::ip::tcp::socket socket_;
-    std::string uid_;
+    std::string session_id_;
+    int user_uid_;
     char data_[MAX_LENGTH];
     bool flag_close_; // 是否关闭
     std::mutex mutex_;

@@ -47,6 +47,7 @@ public:
     bool hsetValue(const char *key, const char *field, const char *value, size_t len);
     std::string hgetValue(const std::string &key, const std::string &field);
     bool delValue(const std::string &key);
+    bool hdelValue(const std::string &key, const std::string &field);
     bool existsValue(const std::string &key);
 
 private:

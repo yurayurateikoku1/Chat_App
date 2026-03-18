@@ -33,6 +33,9 @@ add_executable(${PROJECT_NAME}
     src/mysql_mgr.h src/mysql_mgr.cpp
     src/msg_node.h 
     src/status_grpc_client.h src/status_grpc_client.cpp
+    src/chat_grpc_client.h src/chat_grpc_client.cpp
+    src/user_mgr.h src/user_mgr.cpp
+    src/chat_service_impl.h src/chat_service_impl.cpp
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)

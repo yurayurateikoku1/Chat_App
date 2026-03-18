@@ -317,6 +317,10 @@ std::shared_ptr<UserInfo> MysqlStore::getUser(int uid)
             user_info->email = result->getString("email");
             user_info->uid = result->getInt("uid");
             user_info->passwd = result->getString("pwd");
+            user_info->nick = result->getString("nick");
+            user_info->desc = result->getString("desc");
+            user_info->sex = result->getInt("sex");
+            user_info->icon = result->getString("icon");
             return user_info;
         }
         return nullptr;

@@ -1,5 +1,6 @@
 #include "redis_mgr.h"
 #include "config_mgr.h"
+#include "common.h"
 #include <spdlog/spdlog.h>
 
 RedisPool::RedisPool(size_t pool_size, const std::string &host, int port, const std::string &passwd)
@@ -87,11 +88,13 @@ RedisMgr::~RedisMgr()
 
 bool RedisMgr::getValue(const std::string &key, std::string &value)
 {
-    redisContext *ctx = redis_pool_->getRedisContext();
+    auto ctx = redis_pool_->getRedisContext();
     if (ctx == nullptr)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
+
     auto reply = (redisReply *)redisCommand(ctx, "GET %s", key.c_str());
     if (reply == nullptr)
     {
@@ -120,6 +123,8 @@ bool RedisMgr::setValue(const std::string &key, const std::string &value)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
+
     auto reply = (redisReply *)redisCommand(ctx, "SET %s %s", key.c_str(), value.c_str());
     if (reply == nullptr)
     {
@@ -145,6 +150,7 @@ bool RedisMgr::auth(const std::string &passwd)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "AUTH %s", passwd.c_str());
     if (reply->type == REDIS_REPLY_ERROR)
     {
@@ -164,6 +170,7 @@ bool RedisMgr::lpushValue(const std::string &key, const std::string &value)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "LPUSH %s %s", key.c_str(), value.c_str());
     if (reply == nullptr)
     {
@@ -172,7 +179,7 @@ bool RedisMgr::lpushValue(const std::string &key, const std::string &value)
         return false;
     }
 
-    if (reply->type != REDIS_REPLY_INTEGER || reply->integer <= 0)
+    if (reply->type != REDIS_REPLY_INTEGER || reply->integer < 0)
     {
         SPDLOG_ERROR("redis lpush error:{}", ctx->errstr);
         freeReplyObject(reply);
@@ -190,6 +197,7 @@ bool RedisMgr::lpopValue(const std::string &key, std::string &value)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "LPOP %s", key.c_str());
     if (reply == nullptr || reply->type == REDIS_REPLY_NIL)
     {
@@ -211,6 +219,7 @@ bool RedisMgr::rpopValue(const std::string &key, std::string &value)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "RPOP %s", key.c_str());
     if (reply == nullptr || reply->type == REDIS_REPLY_NIL)
     {
@@ -232,6 +241,7 @@ bool RedisMgr::rpushValue(const std::string &key, const std::string &value)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "RPUSH %s %s", key.c_str(), value.c_str());
     if (reply == nullptr)
     {
@@ -240,7 +250,7 @@ bool RedisMgr::rpushValue(const std::string &key, const std::string &value)
         return false;
     }
 
-    if (reply->type != REDIS_REPLY_INTEGER || reply->integer <= 0)
+    if (reply->type != REDIS_REPLY_INTEGER || reply->integer < 0)
     {
         SPDLOG_ERROR("redis rpush error:{}", ctx->errstr);
         freeReplyObject(reply);
@@ -258,6 +268,7 @@ bool RedisMgr::hsetValue(const std::string &key, const std::string &field, const
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "HSET %s %s %s", key.c_str(), field.c_str(), value.c_str());
     if (reply == nullptr)
     {
@@ -266,7 +277,7 @@ bool RedisMgr::hsetValue(const std::string &key, const std::string &field, const
         return false;
     }
 
-    if (reply->type != REDIS_REPLY_INTEGER || reply->integer <= 0)
+    if (reply->type != REDIS_REPLY_INTEGER || reply->integer < 0)
     {
         SPDLOG_ERROR("redis hset error:{}", ctx->errstr);
         freeReplyObject(reply);
@@ -284,6 +295,7 @@ bool RedisMgr::hsetValue(const char *key, const char *field, const char *value, 
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     const char *args[4];
     size_t arglen[4];
     args[0] = "HSET";
@@ -302,7 +314,7 @@ bool RedisMgr::hsetValue(const char *key, const char *field, const char *value, 
         return false;
     }
 
-    if (reply->type != REDIS_REPLY_INTEGER || reply->integer <= 0)
+    if (reply->type != REDIS_REPLY_INTEGER || reply->integer < 0)
     {
         SPDLOG_ERROR("redis hset error:{}", ctx->errstr);
         freeReplyObject(reply);
@@ -320,6 +332,7 @@ std::string RedisMgr::hgetValue(const std::string &key, const std::string &field
     {
         return "";
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     const char *args[3];
     size_t arglen[3];
     args[0] = "HGET";
@@ -349,6 +362,7 @@ bool RedisMgr::delValue(const std::string &key)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "DEL %s", key.c_str());
     if (reply == nullptr || reply->type != REDIS_REPLY_INTEGER)
     {
@@ -362,6 +376,26 @@ bool RedisMgr::delValue(const std::string &key)
     return true;
 }
 
+bool RedisMgr::hdelValue(const std::string &key, const std::string &field)
+{
+    auto ctx = redis_pool_->getRedisContext();
+    if (ctx == nullptr)
+    {
+        return false;
+    }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
+    auto reply = (redisReply *)redisCommand(ctx, "HDEL %s %s", key.c_str(), field.c_str());
+    if (reply == nullptr || reply->type != REDIS_REPLY_INTEGER || reply->integer == 0)
+    {
+        SPDLOG_ERROR("redis hdel error:{}", ctx->errstr);
+        freeReplyObject(reply);
+        return false;
+    }
+    SPDLOG_INFO("redis hdel key:{} field:{}", key, field);
+    freeReplyObject(reply);
+    return true;
+}
+
 bool RedisMgr::existsValue(const std::string &key)
 {
     auto ctx = redis_pool_->getRedisContext();
@@ -369,6 +403,7 @@ bool RedisMgr::existsValue(const std::string &key)
     {
         return false;
     }
+    Defer defer([this, ctx]() { redis_pool_->returnRedisContext(ctx); });
     auto reply = (redisReply *)redisCommand(ctx, "EXISTS %s", key.c_str());
     if (reply == nullptr || reply->type != REDIS_REPLY_INTEGER || reply->integer == 0)
     {

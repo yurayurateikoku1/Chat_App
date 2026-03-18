@@ -18,6 +18,24 @@
 
 #define MAX_SENDQUE 1000 // 最大发送队列
 
+#define USERIPPREFIX "uip_"
+
+#define USERTOKENPREFIX "utoken_"
+
+#define IPCOUNTPREFIX "ipcount_"
+
+#define USER_BASE_INFO "ubaseinfo_"
+
+#define LOGIN_COUNT "logincount"
+
+#define NAME_INFO "nameinfo_"
+
+#define LOCK_PREFIX "lock_"
+
+#define USER_SESSION_PREFIX "usession_"
+
+#define LOCK_COUNT "lockcount"
+
 enum class MSG_IDS
 {
     MSG_CHAT_LOGIN = 1005,              // 用户登陆
@@ -66,4 +84,37 @@ public:
 
 private:
     std::function<void()> func_;
+};
+
+struct UserInfo
+{
+    UserInfo()
+        : name(""), passwd(""), email(""), uid(0), nick(""), desc(""), sex(0), icon(""), back("")
+    {
+    }
+    std::string name;
+    std::string passwd;
+    std::string email;
+    int uid;
+    std::string nick;
+    std::string desc;
+    int sex;
+    std::string icon;
+    std::string back;
+};
+
+struct ApplyInfo
+{
+    ApplyInfo(int uid, std::string name, std::string desc,
+              std::string icon, std::string nick, int sex, int status)
+        : uid(uid), name(name), desc(desc),
+          icon(icon), nick(nick), sex(sex), status(status) {}
+
+    int uid;
+    std::string name;
+    std::string desc;
+    std::string icon;
+    std::string nick;
+    int sex;
+    int status;
 };

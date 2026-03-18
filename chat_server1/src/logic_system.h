@@ -23,7 +23,7 @@ private:
     void dealMessage();
     void registerCallBacks();
     void loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data);
-
+    bool getBaseInfo(const std::string &base_key, int uid, std::shared_ptr<UserInfo> &user_info);
     std::thread logic_thread_;
     std::queue<std::shared_ptr<LogicNode>> logic_node_queue_;
     std::mutex mutex_;
