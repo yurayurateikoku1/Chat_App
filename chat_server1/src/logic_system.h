@@ -26,6 +26,7 @@ private:
 
     void loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data);
     void searchUserHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data);
+    void addFriendApplyHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data);
 
     std::thread logic_thread_;
     std::queue<std::shared_ptr<LogicNode>> logic_node_queue_;

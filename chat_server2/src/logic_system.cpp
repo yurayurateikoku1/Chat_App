@@ -8,6 +8,7 @@
 #include "common.h"
 #include "status_grpc_client.h"
 #include "user_mgr.h"
+#include "chat_grpc_client.h"
 
 LogicSystem::LogicSystem()
     : flag_stop_(false)
@@ -76,6 +77,8 @@ void LogicSystem::registerCallBacks()
     callBacks_.insert({static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN), std::bind(&LogicSystem::loginHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
 
     callBacks_.insert({static_cast<short>(MSG_IDS::ID_SEARCH_USER_REQ), std::bind(&LogicSystem::searchUserHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
+
+    callBacks_.insert({static_cast<short>(MSG_IDS::ID_ADD_FRIEND_REQ), std::bind(&LogicSystem::addFriendApplyHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
 }
 
 void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
@@ -86,12 +89,12 @@ void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, 
         nlohmann::json return_root;
         auto uid = root["uid"].get<int>();
         auto token = root["token"].get<std::string>();
-        SPDLOG_INFO("uid:{},token:{}", uid, token);
+        SPDLOG_INFO("login uid:{},token:{}", uid, token);
 
         Defer defer([this, &return_root, session]()
                     {
         std::string msg = return_root.dump();
-        SPDLOG_INFO("Sending response: {}", msg);
+        SPDLOG_INFO("loginHandler Sending response: {}", msg);
         session->send(msg,static_cast<short>(MSG_IDS::MSG_CHAT_LOGIN_RSP)); });
 
         // 从redis查看用户token是否正确
@@ -154,7 +157,7 @@ void LogicSystem::searchUserHandler(std::shared_ptr<CSession> session, short msg
     Defer defer([this, &return_root, session]()
                 {
         std::string msg = return_root.dump();
-        SPDLOG_INFO("Sending response: {}", msg);
+        SPDLOG_INFO("searchUserHandler Sending response: {}", msg);
         session->send(msg,static_cast<short>(MSG_IDS::ID_SEARCH_USER_RSP)); });
 
     auto uid_str = std::to_string(uid);
@@ -202,6 +205,84 @@ void LogicSystem::searchUserHandler(std::shared_ptr<CSession> session, short msg
     return_root["sex"] = user_info->sex;
     return_root["icon"] = user_info->icon;
     return_root["error"] = 0;
+}
+
+void LogicSystem::addFriendApplyHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
+{
+    nlohmann::json root = nlohmann::json::parse(msg_data);
+    nlohmann::json return_root;
+    auto uid = root["uid"].get<int>();
+    auto apply_name = root["apply_name"].get<std::string>();
+    auto to_uid = root["to_uid"].get<int>();
+    Defer defer([this, &return_root, session]()
+                {
+        std::string msg = return_root.dump();
+        SPDLOG_INFO("addFriendApplyHandler Sending response: {}", msg);
+        session->send(msg,static_cast<short>(MSG_IDS::ID_ADD_FRIEND_RSP)); });
+
+    return_root["error"] = 0;
+
+    // 更新数据库
+    MysqlMgr::getInstance().addFriendApply(uid, to_uid);
+
+    // 查找redis对方所在的服务器ip
+    auto to_str = std::to_string(to_uid);
+    auto to_ip_key = USERIPPREFIX + to_str;
+    std::string to_ip_value = "";
+    bool ret = RedisMgr::getInstance().getValue(to_ip_key, to_ip_value);
+    if (!ret)
+    {
+        return;
+    }
+
+    auto &config = ConfigMgr::getInstance();
+    auto server_ip = config["self_server"]["host"];
+    auto server_port = config["self_server"]["port"];
+    auto server_name = config["self_server"]["name"];
+
+    // 获取申请者的用户信息
+    std::string base_key = USER_BASE_INFO + std::to_string(uid);
+    auto apply_info = std::make_shared<UserInfo>();
+    bool ret_info = getBaseInfo(base_key, uid, apply_info);
+
+    if (to_ip_value == server_name)
+    {
+        auto session = UserMgr::getInstance().getCSeSsion(to_uid);
+        if (session == nullptr)
+        {
+            return;
+        }
+        nlohmann::json notify_root;
+        notify_root["error"] = 0;
+        notify_root["apply_uid"] = uid;
+        notify_root["username"] = apply_name;
+        notify_root["desc"] = "";
+        if (ret_info)
+        {
+            notify_root["icon"] = apply_info->icon;
+            notify_root["nick"] = apply_info->nick;
+            notify_root["sex"] = apply_info->sex;
+        }
+        std::string msg = notify_root.dump();
+        SPDLOG_INFO("addFriendApplyHandler Sending notify: {}", msg);
+        session->send(msg, static_cast<short>(MSG_IDS::ID_NOTIFY_ADD_FRIEND_REQ));
+    }
+
+    // 构造rpc请求
+    AddFriendReq add_friend_req;
+    add_friend_req.set_applyuid(uid);
+    add_friend_req.set_touid(to_uid);
+    add_friend_req.set_name(apply_name);
+    add_friend_req.set_desc("");
+    if (ret_info)
+    {
+        add_friend_req.set_icon(apply_info->icon);
+        add_friend_req.set_nick(apply_info->nick);
+        add_friend_req.set_sex(apply_info->sex);
+    }
+
+    // 发送通知
+    ChatGrpcClient::getInstance().notifyAddFriend(to_ip_value, add_friend_req);
 }
 
 bool LogicSystem::getBaseInfo(const std::string &base_key, int uid, std::shared_ptr<UserInfo> &user_info)

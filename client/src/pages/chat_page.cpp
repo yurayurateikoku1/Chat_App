@@ -17,6 +17,14 @@ ChatPage::ChatPage(QObject *parent)
             {
         found_user_ = info;
         emit sign2UISearchResultChanged(); });
+
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signReceiveFriendApply, this, [this](std::shared_ptr<AddFriendApply> info)
+            {
+        auto friend_info = std::make_shared<FriendInfo>(
+            info->fromuid, info->name, info->nick, info->icon,
+            info->sex, info->desc, "", "");
+        friend_request_list_model_->addUser(friend_info);
+    });
 }
 
 Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)

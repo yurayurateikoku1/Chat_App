@@ -94,5 +94,30 @@ TextChatMsgRsp ChatGrpcClient::notifyTextChatMsg(const std::string &server_ip, c
 AddFriendRsp ChatGrpcClient::notifyAddFriend(const std::string &server_ip, const AddFriendReq &req)
 {
     AddFriendRsp rsp;
+    Defer defer([&rsp, &req]
+                { 
+                    rsp.set_error(0);
+                    rsp.set_touid(req.touid());
+                    rsp.set_applyuid(req.applyuid()); });
+
+    auto find_iter = pool_map_.find(server_ip);
+    if (find_iter == pool_map_.end())
+    {
+        return rsp;
+    }
+
+    auto &pool = find_iter->second;
+    ClientContext context;
+    auto stub = pool->getConnection();
+    Status status = stub->NotifyAddFriend(&context, req, &rsp);
+    Defer defer1([this, &stub, &pool]
+                 { pool->returnConnection(std::move(stub)); });
+
+    if (!status.ok())
+    {
+        rsp.set_error(static_cast<int32_t>(ErrorCode::RPCFAILED));
+        return rsp;
+    }
+
     return rsp;
 }

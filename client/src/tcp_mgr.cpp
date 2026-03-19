@@ -148,6 +148,70 @@ void TCPMgr::initHttpHandler()
                                                                                json_obj.value("icon").toString());
                                emit signSearchUserResult(search_info);
                            }});
+
+    // 添加好友回包后处理
+    http_handlers_.insert({ReqId::ID_ADD_FRIEND_RSP, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               SPDLOG_INFO("Add friend success!");
+                           }});
+
+    // 收到好友申请回包后处理
+    http_handlers_.insert({ReqId::ID_NOTIFY_ADD_FRIEND_REQ, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto from_uid = json_obj.value("apply_uid").toInt();
+                               auto name = json_obj.value("username").toString();
+                               auto desc = json_obj.value("desc").toString();
+                               auto icon = json_obj.value("icon").toString();
+                               auto nick = json_obj.value("nick").toString();
+                               auto sex = json_obj.value("sex").toInt();
+
+                               auto apply_info = std::make_shared<AddFriendApply>(from_uid, name, desc, icon, nick, sex);
+                               emit signReceiveFriendApply(apply_info);
+
+                               SPDLOG_INFO("Receive friend apply, from_uid: {}, name: {}", from_uid, name.toStdString());
+                           }});
 }
 
 TCPMgr::~TCPMgr()

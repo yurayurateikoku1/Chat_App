@@ -332,6 +332,39 @@ std::shared_ptr<UserInfo> MysqlStore::getUser(int uid)
     }
 }
 
+bool MysqlStore::addFriendApply(int uid, int to_uid)
+{
+    auto connection = mysql_pool_->getConnection();
+    if (connection == nullptr)
+    {
+        return false;
+    }
+
+    Defer defer([this, &connection]()
+                { mysql_pool_->returnConnection(std::move(connection)); });
+    try
+    {
+        // 准备查询语句
+        std::unique_ptr<sql::PreparedStatement> ptmt(connection->conn_->prepareStatement("INSERT INTO friend_apply (from_uid, to_uid) VALUES (?, ?)"
+                                                                                         "ON DUPLICATE KEY UPDATE from_uid = from_uid, to_uid = to_uid"));
+        // 设置输入参数
+        ptmt->setInt(1, uid);
+        ptmt->setInt(2, to_uid);
+        // 执行查询
+        int result = ptmt->execute();
+        if (result < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+    catch (const sql::SQLException &e)
+    {
+        SPDLOG_ERROR("SQLException: {}", e.what());
+        return false;
+    }
+}
+
 MysqlMgr::MysqlMgr()
 {
 }
@@ -358,6 +391,11 @@ bool MysqlMgr::checkPassword(const std::string &email, const std::string &passwo
 bool MysqlMgr::updatePassword(const std::string &username, const std::string &password)
 {
     return mysql_store_.updatePassword(username, password);
+}
+
+bool MysqlMgr::addFriendApply(int uid, int to_uid)
+{
+    return mysql_store_.addFriendApply(uid, to_uid);
 }
 
 std::shared_ptr<UserInfo> MysqlMgr::getUser(int uid)

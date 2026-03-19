@@ -48,4 +48,10 @@ signals:
 
     /// @brief 发送搜索用户结果
     void signSearchUserResult(std::shared_ptr<SearchInfo> info);
+
+    /// @brief 发送好友申请结果
+    void signAddFriendResult();
+
+    /// @brief 接收好友申请
+    void signReceiveFriendApply(std::shared_ptr<AddFriendApply> apply);
 };
