@@ -8,23 +8,19 @@
 
 ChatPage::ChatPage(QObject *parent)
     : QObject(parent),
-      chat_list_model_(new ChatListModel(this)),
-      contact_list_model_(new UserListModel(this)),
+      chat_list_model_(UserMgr::getInstance().chatListModel()),
+      contact_list_model_(UserMgr::getInstance().contactListModel()),
       search_list_model_(new UserListModel(this)),
-      friend_request_list_model_(new UserListModel(this))
+      friend_request_list_model_(UserMgr::getInstance().applyListModel())
 {
     connect(TCPMgr::getInstance().get(), &TCPMgr::signSearchUserResult, this, [this](std::shared_ptr<SearchInfo> info)
             {
         found_user_ = info;
         emit sign2UISearchResultChanged(); });
 
-    connect(TCPMgr::getInstance().get(), &TCPMgr::signReceiveFriendApply, this, [this](std::shared_ptr<AddFriendApply> info)
-            {
-        auto friend_info = std::make_shared<FriendInfo>(
-            info->fromuid, info->name, info->nick, info->icon,
-            info->sex, info->desc, "", "");
-        friend_request_list_model_->addUser(friend_info);
-    });
+    // 收到好友申请 → 存入 UserMgr，model 自动更新 UI
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signReceiveFriendApply, this, [](std::shared_ptr<AddFriendApply> info)
+            { UserMgr::getInstance().addApply(info); });
 }
 
 Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
@@ -41,10 +37,10 @@ Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
 
 Q_INVOKABLE void ChatPage::switchChat(int uid)
 {
-    if (current_uid_ == uid)
+    if (current_chat_uid_ == uid)
         return;
 
-    current_uid_ = uid;
+    current_chat_uid_ = uid;
     current_message_model_ = chat_list_model_->getMessageModel(uid);
     chat_list_model_->clearUnread(uid);
 
@@ -56,8 +52,9 @@ Q_INVOKABLE void ChatPage::startChat(int uid)
 {
     if (!chat_list_model_->hasChat(uid))
     {
-        QString name = contact_list_model_->getName(uid);
-        QString avatar = contact_list_model_->getAvatar(uid);
+        auto &mgr = UserMgr::getInstance();
+        QString name = mgr.contactListModel()->getName(uid);
+        QString avatar = mgr.getAvatarByUid(uid);
         auto info = std::make_shared<FriendInfo>(uid, name, name, avatar, 0, "", "", "");
         chat_list_model_->addChat(info);
     }
@@ -66,12 +63,17 @@ Q_INVOKABLE void ChatPage::startChat(int uid)
 
 Q_INVOKABLE QString ChatPage::getAvatar(int uid) const
 {
-    return contact_list_model_->getAvatar(uid);
+    return UserMgr::getInstance().getAvatarByUid(uid);
 }
 
 Q_INVOKABLE bool ChatPage::getOnLine(int uid) const
 {
-    return contact_list_model_->getOnline(uid);
+    return UserMgr::getInstance().getOnlineByUid(uid);
+}
+
+Q_INVOKABLE void ChatPage::clearFriendRequest(int uid)
+{
+    UserMgr::getInstance().removeApply(uid);
 }
 
 Q_INVOKABLE void ChatPage::searchContacts(const QString &keyword)
@@ -127,11 +129,6 @@ Q_INVOKABLE void ChatPage::addUser2Contact(int to_uid)
     SPDLOG_INFO("uid {} send add friend request to to_uid {}", from_uid, to_uid);
 }
 
-Q_INVOKABLE void ChatPage::clearFriendRequest(int uid)
-{
-    friend_request_list_model_->removeUser(uid);
-}
-
 ChatMessageModel *ChatPage::getChatMessageModel() const
 {
     return current_message_model_;
@@ -159,12 +156,12 @@ UserListModel *ChatPage::getFriendRequestListModel() const
 
 int ChatPage::getCurrentUid() const
 {
-    return current_uid_;
+    return current_chat_uid_;
 }
 
 QString ChatPage::getCurrentName() const
 {
-    return chat_list_model_->getNameByUid(current_uid_);
+    return chat_list_model_->getNameByUid(current_chat_uid_);
 }
 
 SearchResult ChatPage::getSearchResult() const

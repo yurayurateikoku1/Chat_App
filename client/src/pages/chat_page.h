@@ -34,10 +34,12 @@ public:
     Q_INVOKABLE void switchChat(int uid);
     /// @brief 从联系人发起聊天（不存在则创建会话）
     Q_INVOKABLE void startChat(int uid);
-    /// @brief 根据uid获取头像路径
+    /// @brief 根据uid获取头像路径（转发到UserMgr）
     Q_INVOKABLE QString getAvatar(int uid) const;
-    /// @brief 查询在线状态
+    /// @brief 查询在线状态（转发到UserMgr）
     Q_INVOKABLE bool getOnLine(int uid) const;
+    /// @brief 清除好友请求（转发到UserMgr）
+    Q_INVOKABLE void clearFriendRequest(int uid);
     /// @brief 搜索联系人（本地模糊匹配名称）
     Q_INVOKABLE void searchContacts(const QString &keyword);
     /// @brief 通过uid精确查找用户（向服务器查询）
@@ -46,8 +48,6 @@ public:
     Q_INVOKABLE void clearSearchResult();
     /// @brief 添加联系人
     Q_INVOKABLE void addUser2Contact(int to_uid);
-    /// @brief 清除好友请求
-    Q_INVOKABLE void clearFriendRequest(int uid);
 
     ChatMessageModel *getChatMessageModel() const;
     ChatListModel *getChatListModel() const;
@@ -69,12 +69,13 @@ signals:
     void sign2UIMessage(const QString &message, bool normal);
 
 private:
-    ChatListModel *chat_list_model_;           ///< 聊天会话列表数据模型
-    UserListModel *contact_list_model_;        ///< 联系人列表数据模型
-    UserListModel *search_list_model_;         ///< 搜索结果列表数据模型
-    UserListModel *friend_request_list_model_; ///< 好友请求列表数据模型
-    ChatMessageModel *current_message_model_ = nullptr;
-    int current_uid_ = -1;
+    ChatListModel *chat_list_model_;           ///< 聊天会话列表数据模型非拥有指针
+    UserListModel *contact_list_model_;        ///< 联系人列表数据模型非拥有指针
+    UserListModel *friend_request_list_model_; ///< 好友请求列表数据模型非拥有指针
 
+    ChatMessageModel *current_message_model_ = nullptr; //< 当前聊天会话消息列表数据模型
+    int current_chat_uid_ = -1;                         //< 当前聊天会话 uid
+
+    UserListModel *search_list_model_;                 ///< 搜索结果列表数据模型
     std::shared_ptr<SearchInfo> found_user_ = nullptr; ///< 精确查找到的用户信息
 };

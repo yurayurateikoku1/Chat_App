@@ -126,3 +126,4 @@ const QList<std::shared_ptr<FriendInfo>> &UserListModel::getUsers() const
 {
     return users_;
 }
+
