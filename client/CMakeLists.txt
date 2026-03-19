@@ -9,7 +9,7 @@ find_package(Qt6 6.8 REQUIRED COMPONENTS Quick QuickControls2 Network)
 find_package(spdlog CONFIG REQUIRED)
 qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_executable(appclient
+qt_add_executable(client
     src/main.cpp src/singleton.h
     src/pages/login_page.cpp     src/pages/login_page.h
     src/pages/register_page.cpp  src/pages/register_page.h
@@ -24,7 +24,7 @@ qt_add_executable(appclient
     src/models/user_item.h
 )
 
-qt_add_resources(appclient "resources"
+qt_add_resources(client "resources"
     PREFIX "/"
     FILES
         assets/chat.png assets/kejianxing-bukejian.png assets/kejianxing-kejian.png
@@ -48,7 +48,7 @@ qt_add_resources(appclient "resources"
 
 set_source_files_properties(src/pages/Common.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
-qt_add_qml_module(appclient
+qt_add_qml_module(client
     URI client
     VERSION 1.0
     QML_FILES
@@ -70,16 +70,16 @@ qt_add_qml_module(appclient
                 
 )
 
-set_target_properties(appclient PROPERTIES
+set_target_properties(client PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE FALSE 
 )
 
-target_include_directories(appclient PRIVATE src/pages)
+target_include_directories(client PRIVATE src/pages)
 
-target_link_libraries(appclient
+target_link_libraries(client
     PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network
     PRIVATE spdlog::spdlog
 )
@@ -88,7 +88,7 @@ if(WIN32)
     # 使用 windeployqt 自动部署所有 DLL + QML 插件
     find_program(WINDEPLOYQT windeployqt HINTS "${Qt6_DIR}/../../../bin")
     if(WINDEPLOYQT)
-        add_custom_command(TARGET appclient POST_BUILD
+        add_custom_command(TARGET client POST_BUILD
             COMMAND "${WINDEPLOYQT}"
                     --no-compiler-runtime
                     --no-translations
@@ -98,7 +98,7 @@ if(WIN32)
                     --no-ffmpeg
                     --skip-plugin-types qmltooling,generic
                     --qmldir "${CMAKE_CURRENT_SOURCE_DIR}"
-                    "$<TARGET_FILE:appclient>"
+                    "$<TARGET_FILE:client>"
             COMMENT "Running windeployqt..."
         )
     endif()
@@ -107,7 +107,7 @@ if(WIN32)
 endif()
 
 include(GNUInstallDirs)
-install(TARGETS appclient
+install(TARGETS client
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

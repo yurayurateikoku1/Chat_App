@@ -53,6 +53,13 @@ public:
     /// @brief 添加一个好友
     void addFriend(std::shared_ptr<FriendInfo> friend_info);
 
+    /// @brief 添加好友申请列表
+    void appendApplyList(const QJsonArray &apply_list);
+
+    void appendChatList(const QJsonArray &chat_list);
+
+    void appendContactList(const QJsonArray &contact_list);
+
     /// @brief 根据uid查好友
     std::shared_ptr<FriendInfo> getFriend(int uid) const;
 

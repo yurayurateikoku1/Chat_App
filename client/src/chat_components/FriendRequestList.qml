@@ -15,7 +15,7 @@ ListView {
     delegate: FriendRequestListItem {
         width: ListView.view.width
         onSignToolButnAgreeClicked: uid => {
-            ChatPage.addUser2Contact(uid);
+            ChatPage.authFriendApply(uid);
         }
         onSignToolButnDisAgreeClicked: uid => {
             ChatPage.clearFriendRequest(uid);

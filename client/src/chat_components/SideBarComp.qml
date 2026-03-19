@@ -55,8 +55,21 @@ Pane {
                 width: 32
                 height: 32
             }
+            // 小红点
+            Rectangle {
+                width: 10
+                height: 10
+                radius: 5
+                color: "red"
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 4
+                anchors.rightMargin: 4
+                visible: ChatPage.hasFriendRequest
+            }
             onClicked: {
                 root.currentIndex = 2;
+                ChatPage.clearFriendRequestBadge();
                 root.signToolButContactsClicked();
             }
         }

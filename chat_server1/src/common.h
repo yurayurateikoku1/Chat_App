@@ -105,6 +105,7 @@ struct UserInfo
 
 struct ApplyInfo
 {
+    ApplyInfo() {}
     ApplyInfo(int uid, std::string name, std::string desc,
               std::string icon, std::string nick, int sex, int status)
         : uid(uid), name(name), desc(desc),

@@ -1,5 +1,6 @@
 #include "chat_grpc_client.h"
 #include "config_mgr.h"
+#include <spdlog/spdlog.h>
 ChatConnectionPool::ChatConnectionPool(size_t pool_size, const std::string &host, const std::string &port)
     : pool_size_(pool_size), host_(host), port_(port), flag_stop_(false)
 {
@@ -76,8 +77,32 @@ ChatGrpcClient::~ChatGrpcClient()
 
 AuthFriendReq ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req)
 {
-    AuthFriendReq rsp;
-    return rsp;
+    AuthFriendRsp rsp;
+    Defer defer([&rsp, &req]
+                {
+                    rsp.set_error(0);
+                    rsp.set_fromuid(req.fromuid());
+                    rsp.set_touid(req.touid()); });
+
+    auto find_iter = pool_map_.find(server_ip);
+    if (find_iter == pool_map_.end())
+    {
+        return req;
+    }
+
+    auto &pool = find_iter->second;
+    ClientContext context;
+    auto stub = pool->getConnection();
+    Status status = stub->NotifyAuthFriend(&context, req, &rsp);
+    Defer defer1([this, &stub, &pool]
+                 { pool->returnConnection(std::move(stub)); });
+
+    if (!status.ok())
+    {
+        SPDLOG_ERROR("NotifyAuthFriend gRPC failed: {}", status.error_message());
+    }
+
+    return req;
 }
 
 bool ChatGrpcClient::getBaseInfo(const std::string base_key, int uid, std::shared_ptr<UserInfo> &user_info)

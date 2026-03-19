@@ -45,7 +45,23 @@ Rectangle {
                 id: button_friendrequest
                 text: "Friend request"
                 Layout.fillWidth: true
-                onClicked: root.signButtonFriendRequestClicked()
+                onClicked: {
+                    ChatPage.clearFriendRequestBadge();
+                    root.signButtonFriendRequestClicked();
+                }
+
+                // 小红点
+                Rectangle {
+                    width: 10
+                    height: 10
+                    radius: 5
+                    color: "red"
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.topMargin: 4
+                    anchors.rightMargin: 4
+                    visible: ChatPage.hasFriendRequest
+                }
             }
             ContactList {
                 id: contact_list

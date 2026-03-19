@@ -107,11 +107,21 @@ void TCPMgr::initHttpHandler()
 
                                auto uid = json_obj.value("uid").toInt();
                                auto name = json_obj.value("username").toString();
-                               SPDLOG_INFO("Chat login success, uid: {}, name: {}", uid, name.toStdString());
+                               auto token = json_obj.value("token").toString();
+                               auto icon = json_obj.value("icon").toString();
+                               auto nick = json_obj.value("nick").toString();
+                               auto sex = json_obj.value("sex").toInt();
 
-                               UserMgr::getInstance().setUid(uid);
-                               UserMgr::getInstance().setName(name);
-                               UserMgr::getInstance().setToken(json_obj.value("token").toString());
+                               auto user_info = std::make_shared<UserInfo>(uid, name, nick, icon, sex);
+                               UserMgr::getInstance().setUserInfo(user_info);
+                               UserMgr::getInstance().setToken(token);
+                               if (json_obj.contains("apply_list"))
+                               {
+                                   auto apply_list = json_obj.value("apply_list").toArray();
+                                   UserMgr::getInstance().appendApplyList(apply_list);
+                               }
+
+                               SPDLOG_INFO("Chat login success, uid: {}, name: {}", uid, name.toStdString());
 
                                emit signLoginChatStatus(true);
                            }});
@@ -149,7 +159,7 @@ void TCPMgr::initHttpHandler()
                                emit signSearchUserResult(search_info);
                            }});
 
-    // 添加好友回包后处理
+    // 发送好友申请后，服务器返回给自己的回包（A向B发申请 → 服务器回复A）
     http_handlers_.insert({ReqId::ID_ADD_FRIEND_RSP, [this](ReqId id, int len, QByteArray data)
                            {
                                QJsonDocument json_doc = QJsonDocument::fromJson(data);
@@ -176,7 +186,7 @@ void TCPMgr::initHttpHandler()
                                SPDLOG_INFO("Add friend success!");
                            }});
 
-    // 收到好友申请回包后处理
+    // 收到他人的好友申请，服务器推送给被申请方的通知（A向B发申请 → 服务器通知B）
     http_handlers_.insert({ReqId::ID_NOTIFY_ADD_FRIEND_REQ, [this](ReqId id, int len, QByteArray data)
                            {
                                QJsonDocument json_doc = QJsonDocument::fromJson(data);
@@ -211,6 +221,78 @@ void TCPMgr::initHttpHandler()
                                emit signReceiveFriendApply(apply_info);
 
                                SPDLOG_INFO("Receive friend apply, from_uid: {}, name: {}", from_uid, name.toStdString());
+                           }});
+
+    // 同意好友申请后，服务器返回给自己的回包（A同意B的申请 → 服务器回复A）
+    http_handlers_.insert({ReqId::ID_AUTH_FRIEND_RSP, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto name = json_obj.value("username").toString();
+                               auto nick = json_obj.value("nick").toString();
+                               auto icon = json_obj.value("icon").toString();
+                               auto sex = json_obj.value("sex").toInt();
+                               auto uid = json_obj.value("uid").toInt();
+
+                               auto friend_info = std::make_shared<FriendInfo>(uid, name, nick, icon, sex, "", "", "");
+                               UserMgr::getInstance().addFriend(friend_info);
+                               UserMgr::getInstance().removeApply(uid);
+                               SPDLOG_INFO("friend auth success,contains name: {}, nick: {}, uid: {}", name.toStdString(), nick.toStdString(), uid);
+                           }});
+
+    // 对方同意好友申请后，服务器推送给申请发起方的通知（A同意B的申请 → 服务器通知B）
+    http_handlers_.insert({ReqId::ID_NOTIFY_AUTH_FRIEND_REQ, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto from_uid = json_obj.value("from_uid").toInt();
+                               auto name = json_obj.value("username").toString();
+                               auto desc = json_obj.value("desc").toString();
+                               auto icon = json_obj.value("icon").toString();
+                               auto nick = json_obj.value("nick").toString();
+                               auto sex = json_obj.value("sex").toInt();
+
+                               auto friend_info = std::make_shared<FriendInfo>(from_uid, name, nick, icon, sex, "", "", "");
+                               UserMgr::getInstance().addFriend(friend_info);
+                               SPDLOG_INFO("Peer approved friend request, from_uid: {}, name: {}", from_uid, name.toStdString());
                            }});
 }
 

@@ -59,6 +59,9 @@ public:
     bool checkPassword(const std::string &email, const std::string &password, UserInfo &user_info);
     std::shared_ptr<UserInfo> getUser(int uid);
     bool addFriendApply(int uid, int to_uid);
+    bool getFriendApplyList(int to_uid, std::vector<std::shared_ptr<ApplyInfo>> &list, int begin, int limit);
+    bool authFriendApply(int uid, int to_uid);
+    bool addFriend(int uid, int to_uid, const std::string &back_name);
 
 private:
     std::unique_ptr<MysqlPool> mysql_pool_;
@@ -78,7 +81,11 @@ public:
     bool checkPassword(const std::string &email, const std::string &password, UserInfo &user_info);
     bool updatePassword(const std::string &username, const std::string &password);
     bool addFriendApply(int uid, int to_uid);
+    bool authFriendApply(int uid, int to_uid);
+    bool addFriend(int uid, int to_uid, const std::string &back_name);
     std::shared_ptr<UserInfo> getUser(int uid);
+
+    bool getFriendApplyList(int to_uid, std::vector<std::shared_ptr<ApplyInfo>> &list, int begin, int limit);
 
 private:
     MysqlMgr();

@@ -365,6 +365,119 @@ bool MysqlStore::addFriendApply(int uid, int to_uid)
     }
 }
 
+bool MysqlStore::getFriendApplyList(int to_uid, std::vector<std::shared_ptr<ApplyInfo>> &list, int begin, int limit)
+{
+    auto connection = mysql_pool_->getConnection();
+    if (connection == nullptr)
+    {
+        return false;
+    }
+
+    Defer defer([this, &connection]()
+                { mysql_pool_->returnConnection(std::move(connection)); });
+
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> ptmt(connection->conn_->prepareStatement("select apply.from_uid, apply.status, user.name, "
+                                                                                         "user.nick, user.sex, user.icon from friend_apply as apply join user on apply.from_uid = user.uid where apply.to_uid = ? "
+                                                                                         "and apply.id > ? order by apply.id ASC LIMIT ? "));
+        ptmt->setInt(1, to_uid);
+        ptmt->setInt(2, begin);
+        ptmt->setInt(3, limit);
+        std::unique_ptr<sql::ResultSet> result(ptmt->executeQuery());
+        while (result->next())
+        {
+            std::shared_ptr<ApplyInfo> apply_info = std::make_shared<ApplyInfo>();
+            apply_info->uid = result->getInt("from_uid");
+            apply_info->name = result->getString("name");
+            apply_info->nick = result->getString("nick");
+            apply_info->sex = result->getInt("sex");
+            apply_info->status = result->getInt("status");
+            apply_info->desc = "";
+            apply_info->icon = result->getString("icon");
+            list.push_back(apply_info);
+        }
+        return true;
+    }
+    catch (const sql::SQLException &e)
+    {
+        SPDLOG_ERROR("SQLException: {}", e.what());
+        return false;
+    }
+}
+
+bool MysqlStore::authFriendApply(int uid, int to_uid)
+{
+    auto connection = mysql_pool_->getConnection();
+    if (connection == nullptr)
+    {
+        return false;
+    }
+
+    Defer defer([this, &connection]()
+                { mysql_pool_->returnConnection(std::move(connection)); });
+
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> ptmt(connection->conn_->prepareStatement("update friend_apply set status = 1 where from_uid = ? and to_uid = ?"));
+        ptmt->setInt(1, to_uid);
+        ptmt->setInt(2, uid);
+        int result = ptmt->execute();
+        if (result < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+    catch (const sql::SQLException &e)
+    {
+        SPDLOG_ERROR("SQLException: {}", e.what());
+        return false;
+    }
+}
+
+bool MysqlStore::addFriend(int uid, int to_uid, const std::string &back_name)
+{
+    auto connection = mysql_pool_->getConnection();
+    if (connection == nullptr)
+    {
+        return false;
+    }
+
+    Defer defer([this, &connection]()
+                { mysql_pool_->returnConnection(std::move(connection)); });
+
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> ptmt(connection->conn_->prepareStatement("INSERT IGNORE INTO friend (self_id, friend_id, back) VALUES (?, ?, ?)"));
+        ptmt->setInt(1, uid);
+        ptmt->setInt(2, to_uid);
+        ptmt->setString(3, back_name);
+        int result = ptmt->execute();
+        if (result < 0)
+        {
+            return false;
+        }
+
+        std::unique_ptr<sql::PreparedStatement> ptmt1(connection->conn_->prepareStatement("INSERT IGNORE INTO friend (self_id, friend_id, back) VALUES (?, ?, ?)"));
+        ptmt1->setInt(1, to_uid);
+        ptmt1->setInt(2, uid);
+        ptmt1->setString(3, back_name);
+        int result1 = ptmt1->execute();
+        if (result1 < 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    catch (const sql::SQLException &e)
+    {
+        SPDLOG_ERROR("SQLException: {}", e.what());
+        return false;
+    }
+}
+
 MysqlMgr::MysqlMgr()
 {
 }
@@ -398,7 +511,22 @@ bool MysqlMgr::addFriendApply(int uid, int to_uid)
     return mysql_store_.addFriendApply(uid, to_uid);
 }
 
+bool MysqlMgr::authFriendApply(int uid, int to_uid)
+{
+    return mysql_store_.authFriendApply(uid, to_uid);
+}
+
+bool MysqlMgr::addFriend(int uid, int to_uid, const std::string &back_name)
+{
+    return mysql_store_.addFriend(uid, to_uid, back_name);
+}
+
 std::shared_ptr<UserInfo> MysqlMgr::getUser(int uid)
 {
     return mysql_store_.getUser(uid);
+}
+
+bool MysqlMgr::getFriendApplyList(int to_uid, std::vector<std::shared_ptr<ApplyInfo>> &list, int begin, int limit)
+{
+    return mysql_store_.getFriendApplyList(to_uid, list, begin, limit);
 }

@@ -102,8 +102,37 @@ void UserMgr::removeApply(int uid)
 
 void UserMgr::addFriend(std::shared_ptr<FriendInfo> friend_info)
 {
+    if (!contact_list_model_->getName(friend_info->uid).isEmpty())
+        return;
     contact_list_model_->addUser(friend_info);
-    friend_map_[friend_info->uid] = friend_info;
+}
+
+void UserMgr::appendApplyList(const QJsonArray &apply_list)
+{
+    for (const QJsonValue &apply : apply_list)
+    {
+        auto name = apply["username"].toString();
+        auto nick = apply["nick"].toString();
+        auto icon = apply["icon"].toString();
+        auto uid = apply["uid"].toInt();
+        auto sex = apply["sex"].toInt();
+        auto desc = apply["desc"].toString();
+        auto status = apply["status"].toInt();
+        if (status != 0)
+        {
+            continue;
+        }
+        auto friend_info = std::make_shared<FriendInfo>(uid, name, nick, icon, sex, desc, "", "");
+        apply_list_model_->addUser(friend_info);
+    }
+}
+
+void UserMgr::appendChatList(const QJsonArray &chat_list)
+{
+}
+
+void UserMgr::appendContactList(const QJsonArray &contact_list)
+{
 }
 
 std::shared_ptr<FriendInfo> UserMgr::getFriend(int uid) const

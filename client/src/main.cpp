@@ -7,10 +7,14 @@
 #include <QQuickStyle>
 #include <QDir>
 #include <QIcon>
+#include "user_mgr.h"
+
 int main(int argc, char *argv[])
 {
     spdlog::stdout_color_mt("console");
     QGuiApplication app(argc, argv);
+    // 确保 UserMgr 在主线程创建，避免 model 线程归属问题
+    UserMgr::getInstance();
     QQuickStyle::setStyle("Basic");
     app.setWindowIcon(QIcon(":/assets/chat.png"));
 

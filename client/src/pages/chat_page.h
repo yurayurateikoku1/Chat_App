@@ -25,6 +25,8 @@ class ChatPage : public QObject
     // 服务器精确查找用户的结果
     Q_PROPERTY(SearchResult getSearchResult READ getSearchResult NOTIFY sign2UISearchResultChanged)
 
+    Q_PROPERTY(bool hasFriendRequest READ hasFriendRequest NOTIFY hasFriendRequestChanged)
+
 public:
     explicit ChatPage(QObject *parent = nullptr);
 
@@ -48,6 +50,8 @@ public:
     Q_INVOKABLE void clearSearchResult();
     /// @brief 添加联系人
     Q_INVOKABLE void addUser2Contact(int to_uid);
+    /// @brief 认证好友请求
+    Q_INVOKABLE void authFriendApply(int to_uid);
 
     ChatMessageModel *getChatMessageModel() const;
     ChatListModel *getChatListModel() const;
@@ -58,8 +62,11 @@ public:
     QString getCurrentName() const;
 
     SearchResult getSearchResult() const;
+    bool hasFriendRequest() const;
+    Q_INVOKABLE void clearFriendRequestBadge();
 
 signals:
+    void hasFriendRequestChanged();
     void sign2UIChatMessageModelChanged();
     void sign2UICurrentUidChanged();
     void sign2UISearchResultChanged();
@@ -78,4 +85,5 @@ private:
 
     UserListModel *search_list_model_;                 ///< 搜索结果列表数据模型
     std::shared_ptr<SearchInfo> found_user_ = nullptr; ///< 精确查找到的用户信息
+    bool has_friend_request_ = false;                  ///< 是否有未读好友申请
 };

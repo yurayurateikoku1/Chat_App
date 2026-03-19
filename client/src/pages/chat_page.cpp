@@ -18,9 +18,21 @@ ChatPage::ChatPage(QObject *parent)
         found_user_ = info;
         emit sign2UISearchResultChanged(); });
 
-    // 收到好友申请 → 存入 UserMgr，model 自动更新 UI
-    connect(TCPMgr::getInstance().get(), &TCPMgr::signReceiveFriendApply, this, [](std::shared_ptr<AddFriendApply> info)
-            { UserMgr::getInstance().addApply(info); });
+    // 在线收到好友申请 → 存入 UserMgr，model 自动更新 UI，显示小红点
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signReceiveFriendApply, this, [this](std::shared_ptr<AddFriendApply> info)
+            {
+        UserMgr::getInstance().addApply(info);
+        if (!has_friend_request_) {
+            has_friend_request_ = true;
+            emit hasFriendRequestChanged();
+        } });
+
+    // 登录时已加载的申请列表，初始化小红点状态
+    if (friend_request_list_model_ && friend_request_list_model_->rowCount() > 0)
+    {
+        has_friend_request_ = true;
+        emit hasFriendRequestChanged();
+    }
 }
 
 Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
@@ -129,6 +141,21 @@ Q_INVOKABLE void ChatPage::addUser2Contact(int to_uid)
     SPDLOG_INFO("uid {} send add friend request to to_uid {}", from_uid, to_uid);
 }
 
+Q_INVOKABLE void ChatPage::authFriendApply(int to_uid)
+{
+    QJsonObject json;
+    auto from_uid = UserMgr::getInstance().getUid();
+    json["from_uid"] = from_uid;
+    json["to_uid"] = to_uid;
+    json["back"] = UserMgr::getInstance().getUserInfo()->nick;
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [data]
+                              { TCPMgr::getInstance()->tcpSendData(ReqId::ID_AUTH_FRIEND_REQ, data); }, Qt::QueuedConnection);
+    SPDLOG_INFO("from_uid {} send authFriendApply request to to_uid {}", from_uid, to_uid);
+    emit sign2UIMessage("Accepting friend request...", true);
+}
+
 ChatMessageModel *ChatPage::getChatMessageModel() const
 {
     return current_message_model_;
@@ -169,4 +196,18 @@ SearchResult ChatPage::getSearchResult() const
     if (!found_user_)
         return {};
     return {found_user_->uid, found_user_->name, found_user_->icon, true};
+}
+
+bool ChatPage::hasFriendRequest() const
+{
+    return has_friend_request_;
+}
+
+void ChatPage::clearFriendRequestBadge()
+{
+    if (has_friend_request_)
+    {
+        has_friend_request_ = false;
+        emit hasFriendRequestChanged();
+    }
 }
