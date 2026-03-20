@@ -133,6 +133,17 @@ void UserMgr::appendChatList(const QJsonArray &chat_list)
 
 void UserMgr::appendContactList(const QJsonArray &contact_list)
 {
+    for (const QJsonValue &contact : contact_list)
+    {
+        auto name = contact["username"].toString();
+        auto nick = contact["nick"].toString();
+        auto icon = contact["icon"].toString();
+        auto uid = contact["uid"].toInt();
+        auto sex = contact["sex"].toInt();
+        auto desc = contact["desc"].toString();
+        auto friend_info = std::make_shared<FriendInfo>(uid, name, nick, icon, sex, desc, "", "");
+        contact_list_model_->addUser(friend_info);
+    }
 }
 
 std::shared_ptr<FriendInfo> UserMgr::getFriend(int uid) const

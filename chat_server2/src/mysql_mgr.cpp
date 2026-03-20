@@ -478,6 +478,48 @@ bool MysqlStore::addFriend(int uid, int to_uid, const std::string &back_name)
     }
 }
 
+bool MysqlStore::getFriendList(int uid, std::vector<std::shared_ptr<UserInfo>> &list)
+{
+    auto connection = mysql_pool_->getConnection();
+    if (connection == nullptr)
+    {
+        return false;
+    }
+
+    Defer defer([this, &connection]()
+                { mysql_pool_->returnConnection(std::move(connection)); });
+
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> ptmt(connection->conn_->prepareStatement("select * from friend where self_id = ?"));
+        ptmt->setInt(1, uid);
+        std::unique_ptr<sql::ResultSet> result(ptmt->executeQuery());
+        while (result->next())
+        {
+            std::shared_ptr<UserInfo> user_info = std::make_shared<UserInfo>();
+            user_info->uid = result->getInt("friend_id");
+
+            auto user_tmp = getUser(user_info->uid);
+            if (user_tmp == nullptr)
+            {
+                continue;
+            }
+            user_info->name = user_tmp->name;
+            user_info->nick = user_tmp->nick;
+            user_info->sex = user_tmp->sex;
+            user_info->desc = user_tmp->desc;
+            user_info->icon = user_tmp->icon;
+            list.push_back(user_info);
+        }
+        return true;
+    }
+    catch (const sql::SQLException &e)
+    {
+        SPDLOG_ERROR("SQLException: {}", e.what());
+        return false;
+    }
+}
+
 MysqlMgr::MysqlMgr()
 {
 }
@@ -529,4 +571,9 @@ std::shared_ptr<UserInfo> MysqlMgr::getUser(int uid)
 bool MysqlMgr::getFriendApplyList(int to_uid, std::vector<std::shared_ptr<ApplyInfo>> &list, int begin, int limit)
 {
     return mysql_store_.getFriendApplyList(to_uid, list, begin, limit);
+}
+
+bool MysqlMgr::getFriendList(int uid, std::vector<std::shared_ptr<UserInfo>> &list)
+{
+    return mysql_store_.getFriendList(uid, list);
 }

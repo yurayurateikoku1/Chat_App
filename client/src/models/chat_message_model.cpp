@@ -38,10 +38,10 @@ QHash<int, QByteArray> ChatMessageModel::roleNames() const
         {IsSelfRole, "isSelf"}};
 }
 
-void ChatMessageModel::addMessage(const QString &message, const QString &time, bool is_self)
+void ChatMessageModel::addMessage(const QString &msgid, const QString &message, const QString &time, bool is_self)
 {
     beginInsertRows(QModelIndex(), messages_.size(), messages_.size());
-    messages_.append({message, time, is_self});
+    messages_.append({msgid, message, time, is_self});
     endInsertRows();
 }
 

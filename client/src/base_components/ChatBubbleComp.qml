@@ -9,8 +9,8 @@ Item {
     required property string time
     required property bool isSelf
 
-    // 头像：自己的为空（显示占位），对方的从联系人模型按当前会话uid查询
-    readonly property string icon: isSelf ? "" : ChatPage.getAvatar(ChatPage.getCurrentUid)
+    // 头像：自己的和对方的都通过属性绑定，switchChat时更新对方头像
+    readonly property string icon: isSelf ? ChatPage.selfIcon : ChatPage.currentAvatar
 
     implicitHeight: bubble_layout.implicitHeight + 10
 

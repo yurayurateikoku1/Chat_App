@@ -74,9 +74,9 @@ ChatGrpcClient::~ChatGrpcClient()
 {
 }
 
-AuthFriendReq ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req)
+AuthFriendRsp ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req)
 {
-    AuthFriendReq rsp;
+    AuthFriendRsp rsp;
     return rsp;
 }
 

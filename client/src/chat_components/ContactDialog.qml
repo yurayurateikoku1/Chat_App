@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Dialog {
     id: root
     width: 300
-    height: 300
+    height: 400
     modal: true
     parent: Overlay.overlay
     x: (parent.width - width) / 2
@@ -86,6 +86,31 @@ Dialog {
             }
         }
 
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+
+            ToolButtonComp {
+                id: toolbutton_ipone
+                hoverColor: "#ffffff"
+                Image {
+                    anchors.centerIn: parent
+                    source: "qrc:/assets/dianhua.png"
+                    width: 32
+                    height: 32
+                }
+            }
+
+            ToolButtonComp {
+                id: toolbutton_video
+                hoverColor: "#ffffff"
+                Image {
+                    anchors.centerIn: parent
+                    source: "qrc:/assets/shipin.png"
+                    width: 32
+                    height: 32
+                }
+            }
+        }
         ButtonComp {
             text: "删除联系人"
             bgColor: "red"

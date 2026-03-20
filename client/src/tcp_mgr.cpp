@@ -115,10 +115,19 @@ void TCPMgr::initHttpHandler()
                                auto user_info = std::make_shared<UserInfo>(uid, name, nick, icon, sex);
                                UserMgr::getInstance().setUserInfo(user_info);
                                UserMgr::getInstance().setToken(token);
+
+                               // 更新好友请求列表
                                if (json_obj.contains("apply_list"))
                                {
                                    auto apply_list = json_obj.value("apply_list").toArray();
                                    UserMgr::getInstance().appendApplyList(apply_list);
+                               }
+
+                               // 更新好友列表
+                               if (json_obj.contains("friend_list"))
+                               {
+                                   auto friend_list = json_obj.value("friend_list").toArray();
+                                   UserMgr::getInstance().appendContactList(friend_list);
                                }
 
                                SPDLOG_INFO("Chat login success, uid: {}, name: {}", uid, name.toStdString());
@@ -293,6 +302,89 @@ void TCPMgr::initHttpHandler()
                                auto friend_info = std::make_shared<FriendInfo>(from_uid, name, nick, icon, sex, "", "", "");
                                UserMgr::getInstance().addFriend(friend_info);
                                SPDLOG_INFO("Peer approved friend request, from_uid: {}, name: {}", from_uid, name.toStdString());
+                           }});
+
+    // 发送消息后，服务器返回给自己的回包（A向B发消息 → 服务器回复A）
+    http_handlers_.insert({ReqId::ID_TEXT_CHAT_MSG_RSP, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto from_uid = json_obj.value("from_uid").toInt();
+                               auto to_uid = json_obj.value("to_uid").toInt();
+
+                               SPDLOG_INFO("from_uid:{} Send message to to_uid:{} success!", from_uid, to_uid);
+                           }});
+
+    // 发送消息后，服务器推送给对方的通知（A向B发消息 → 服务器通知B）
+    http_handlers_.insert({ReqId::ID_NOTIFY_TEXT_CHAT_MSG_REQ, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   return;
+                               }
+
+                               auto from_uid = json_obj.value("from_uid").toInt();
+                               auto to_uid = json_obj.value("to_uid").toInt();
+
+                               auto text_array = json_obj.value("text_array").toArray();
+                               for (const auto &item : text_array)
+                               {
+                                   auto obj = item.toObject();
+                                   auto msgid = obj.value("msgid").toString();
+                                   auto content = obj.value("content").toString();
+
+                                   auto &mgr = UserMgr::getInstance();
+                                   auto *chat_model = mgr.chatListModel();
+                                   // 如果会话不存在，自动创建
+                                   if (!chat_model->hasChat(from_uid))
+                                   {
+                                       QString name = mgr.contactListModel()->getName(from_uid);
+                                       QString avatar = mgr.contactListModel()->getAvatar(from_uid);
+                                       auto info = std::make_shared<FriendInfo>(from_uid, name, name, avatar, 0, "", "", "");
+                                       chat_model->addChat(info);
+                                   }
+                                   auto *msg_model = chat_model->getMessageModel(from_uid);
+                                   if (msg_model)
+                                   {
+                                       msg_model->addMessage(msgid, content, QDateTime::currentDateTime().toString("hh:mm"), false);
+                                       chat_model->incrementUnread(from_uid);
+                                   }
+                               }
                            }});
 }
 

@@ -123,6 +123,9 @@ ChatMessageModel *ChatListModel::getMessageModel(int uid)
 
 void ChatListModel::incrementUnread(int uid)
 {
+    if (uid == current_chat_uid_)
+        return;
+
     for (int i = 0; i < chats_.size(); ++i)
     {
         if (chats_[i].user->uid == uid)
@@ -133,6 +136,16 @@ void ChatListModel::incrementUnread(int uid)
             return;
         }
     }
+}
+
+void ChatListModel::setCurrentChatUid(int uid)
+{
+    current_chat_uid_ = uid;
+}
+
+int ChatListModel::currentChatUid() const
+{
+    return current_chat_uid_;
 }
 
 void ChatListModel::clearUnread(int uid)

@@ -5,6 +5,7 @@
 // 聊天消息数据结构
 struct ChatMessage
 {
+    QString msgid;   // 消息唯一标识
     QString message; // 消息内容
     QString time;    // 发送时间
     bool is_self;    // 是否为自己发送的消息
@@ -36,7 +37,7 @@ QML_ELEMENT // 注册为 QML 类型
     QHash<int, QByteArray> roleNames() const override;
 
     ///@brief 添加一条消息到列表末尾
-    Q_INVOKABLE void addMessage(const QString &message, const QString &time, bool is_self);
+    Q_INVOKABLE void addMessage(const QString &msgid, const QString &message, const QString &time, bool is_self);
     ///@brief 清空所有消息
     Q_INVOKABLE void clearMessages();
 

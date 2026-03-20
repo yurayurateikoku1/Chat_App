@@ -72,7 +72,7 @@ public:
     /// @param server_ip
     /// @param req
     /// @return
-    AuthFriendReq notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req);
+    AuthFriendRsp notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req);
 
     bool getBaseInfo(const std::string base_key, int uid, std::shared_ptr<UserInfo> &user_info);
 

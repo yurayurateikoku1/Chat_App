@@ -69,7 +69,7 @@ public:
     /// @param server_ip
     /// @param req
     /// @return
-    AuthFriendReq notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req);
+    AuthFriendRsp notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req);
 
     TextChatMsgRsp notifyTextChatMsg(const std::string &server_ip, const TextChatMsgReq &req,
                                      const nlohmann::json &json);

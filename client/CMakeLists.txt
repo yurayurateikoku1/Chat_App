@@ -31,6 +31,7 @@ qt_add_resources(client "resources"
         assets/duihuaxinxi.png assets/fenxiang.png assets/kaixin.png
         assets/shangchuan.png assets/sousuo.png assets/tianjiayonghu.png
         assets/tongxunlu.png assets/agree.png assets/disagree.png
+        assets/shipin.png assets/dianhua.png
         assets/avatars/Artboard_0.png
         assets/avatars/Artboard_1.png assets/avatars/Artboard_2.png assets/avatars/Artboard_3.png
         assets/avatars/Artboard_4.png assets/avatars/Artboard_5.png assets/avatars/Artboard_6.png

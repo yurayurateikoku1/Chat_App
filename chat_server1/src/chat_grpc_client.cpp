@@ -75,7 +75,7 @@ ChatGrpcClient::~ChatGrpcClient()
 {
 }
 
-AuthFriendReq ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req)
+AuthFriendRsp ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, const AuthFriendReq &req)
 {
     AuthFriendRsp rsp;
     Defer defer([&rsp, &req]
@@ -87,7 +87,7 @@ AuthFriendReq ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, con
     auto find_iter = pool_map_.find(server_ip);
     if (find_iter == pool_map_.end())
     {
-        return req;
+        return rsp;
     }
 
     auto &pool = find_iter->second;
@@ -102,7 +102,7 @@ AuthFriendReq ChatGrpcClient::notifyAuthFriend(const std::string &server_ip, con
         SPDLOG_ERROR("NotifyAuthFriend gRPC failed: {}", status.error_message());
     }
 
-    return req;
+    return rsp;
 }
 
 bool ChatGrpcClient::getBaseInfo(const std::string base_key, int uid, std::shared_ptr<UserInfo> &user_info)
@@ -113,6 +113,37 @@ bool ChatGrpcClient::getBaseInfo(const std::string base_key, int uid, std::share
 TextChatMsgRsp ChatGrpcClient::notifyTextChatMsg(const std::string &server_ip, const TextChatMsgReq &req, const nlohmann::json &json)
 {
     TextChatMsgRsp rsp;
+    rsp.set_error(0);
+    Defer defer([&rsp, &req]
+                {
+                    rsp.set_fromuid(req.fromuid());
+                    rsp.set_touid(req.touid());
+                    for (const auto &msg : req.textmsgs())
+                    {
+                        TextChatData *new_msg= rsp.add_textmsgs();
+                        new_msg->set_msgid(msg.msgid());
+                        new_msg->set_msgcontent(msg.msgcontent());
+                    } });
+
+    auto find_iter = pool_map_.find(server_ip);
+    if (find_iter == pool_map_.end())
+    {
+        return rsp;
+    }
+
+    auto &pool = find_iter->second;
+    ClientContext context;
+    auto stub = pool->getConnection();
+    Status status = stub->NotifyTextChatMsg(&context, req, &rsp);
+    Defer defer1([this, &stub, &pool]
+                 { pool->returnConnection(std::move(stub)); });
+
+    if (!status.ok())
+    {
+        rsp.set_error(static_cast<int32_t>(ErrorCode::RPCFAILED));
+        return rsp;
+    }
+
     return rsp;
 }
 

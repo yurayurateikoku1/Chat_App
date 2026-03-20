@@ -25,7 +25,7 @@ Pane {
             id: toolbutton_avatar
             bgColor: root.currentIndex === 0 ? Common.color6 : "#FFFFFF"
             Image {
-                source: "qrc:/assets/avatars/Artboard_1.png"
+                source: ChatPage.getSelfIcon()
             }
             onClicked: {
                 root.currentIndex = 0;
@@ -69,7 +69,6 @@ Pane {
             }
             onClicked: {
                 root.currentIndex = 2;
-                ChatPage.clearFriendRequestBadge();
                 root.signToolButContactsClicked();
             }
         }

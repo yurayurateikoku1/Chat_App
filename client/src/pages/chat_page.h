@@ -21,9 +21,12 @@ class ChatPage : public QObject
 
     Q_PROPERTY(int getCurrentUid READ getCurrentUid NOTIFY sign2UICurrentUidChanged)
     Q_PROPERTY(QString getCurrentName READ getCurrentName NOTIFY sign2UICurrentUidChanged)
+    Q_PROPERTY(QString currentAvatar READ getCurrentAvatar NOTIFY sign2UICurrentUidChanged)
 
     // 服务器精确查找用户的结果
     Q_PROPERTY(SearchResult getSearchResult READ getSearchResult NOTIFY sign2UISearchResultChanged)
+
+    Q_PROPERTY(QString selfIcon READ getSelfIcon CONSTANT)
 
     Q_PROPERTY(bool hasFriendRequest READ hasFriendRequest NOTIFY hasFriendRequestChanged)
 
@@ -36,6 +39,8 @@ public:
     Q_INVOKABLE void switchChat(int uid);
     /// @brief 从联系人发起聊天（不存在则创建会话）
     Q_INVOKABLE void startChat(int uid);
+    /// @brief 获取自己的头像路径
+    Q_INVOKABLE QString getSelfIcon() const;
     /// @brief 根据uid获取头像路径（转发到UserMgr）
     Q_INVOKABLE QString getAvatar(int uid) const;
     /// @brief 查询在线状态（转发到UserMgr）
@@ -60,6 +65,7 @@ public:
     UserListModel *getFriendRequestListModel() const;
     int getCurrentUid() const;
     QString getCurrentName() const;
+    QString getCurrentAvatar() const;
 
     SearchResult getSearchResult() const;
     bool hasFriendRequest() const;
@@ -82,6 +88,7 @@ private:
 
     ChatMessageModel *current_message_model_ = nullptr; //< 当前聊天会话消息列表数据模型
     int current_chat_uid_ = -1;                         //< 当前聊天会话 uid
+    QString current_avatar_;                              //< 当前聊天对方头像
 
     UserListModel *search_list_model_;                 ///< 搜索结果列表数据模型
     std::shared_ptr<SearchInfo> found_user_ = nullptr; ///< 精确查找到的用户信息

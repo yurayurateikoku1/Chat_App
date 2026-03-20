@@ -49,5 +49,7 @@
         <file>assets/avatars/Artboard_35.png</file>
         <file>assets/agree.png</file>
         <file>assets/disagree.png</file>
+        <file>assets/dianhua.png</file>
+        <file>assets/shipin.png</file>
     </qresource>
 </RCC>

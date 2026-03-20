@@ -54,11 +54,15 @@ public:
     ///@brief 删除指定uid的会话
     Q_INVOKABLE void removeChat(int uid);
 
-    ///@brief 未读数+1
+    ///@brief 未读数+1（当前聊天对象不计未读）
     void incrementUnread(int uid);
 
     ///@brief 清零未读数
     void clearUnread(int uid);
+
+    ///@brief 设置当前聊天uid
+    void setCurrentChatUid(int uid);
+    int currentChatUid() const;
 
 signals:
     void hasMoreChanged();
@@ -75,5 +79,6 @@ private:
     bool has_more_ = true;
     bool loading_ = false;
     int page_ = 0;
+    int current_chat_uid_ = -1;
     static constexpr int kPageSize = 20;
 };

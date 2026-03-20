@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QUuid>
 #include <spdlog/spdlog.h>
 
 ChatPage::ChatPage(QObject *parent)
@@ -43,8 +44,29 @@ Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
     auto *model = chat_list_model_->getMessageModel(uid);
     if (!model)
         return;
-    // TODO: 替换为实际的时间获取
-    model->addMessage(message, "10:10", true);
+    auto now = QDateTime::currentDateTime();
+    QString date_str = now.toString("yyyy-MM-dd");
+    QString time_str = now.toString("hh:mm");
+    // 生成唯一id
+    QUuid uuid = QUuid::createUuid();
+    QString id = uuid.toString();
+    QJsonObject json;
+    QJsonObject msg;
+    msg["msgid"] = id;
+    msg["content"] = message;
+    QJsonArray textArray;
+    textArray.append(msg);
+    int from_uid = UserMgr::getInstance().getUid();
+    json["from_uid"] = from_uid;
+    json["to_uid"] = uid;
+    json["text_array"] = textArray;
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [data]()
+                              { TCPMgr::getInstance()->tcpSendData(ReqId::ID_TEXT_CHAT_MSG_REQ, data); }, Qt::QueuedConnection);
+
+    // TextChatData msg(id, message, from_uid, uid);
+    model->addMessage(id, message, time_str, true);
 }
 
 Q_INVOKABLE void ChatPage::switchChat(int uid)
@@ -54,6 +76,8 @@ Q_INVOKABLE void ChatPage::switchChat(int uid)
 
     current_chat_uid_ = uid;
     current_message_model_ = chat_list_model_->getMessageModel(uid);
+    current_avatar_ = UserMgr::getInstance().getAvatarByUid(uid);
+    chat_list_model_->setCurrentChatUid(uid);
     chat_list_model_->clearUnread(uid);
 
     emit sign2UICurrentUidChanged();
@@ -71,6 +95,11 @@ Q_INVOKABLE void ChatPage::startChat(int uid)
         chat_list_model_->addChat(info);
     }
     switchChat(uid);
+}
+
+Q_INVOKABLE QString ChatPage::getSelfIcon() const
+{
+    return UserMgr::getInstance().getIcon();
 }
 
 Q_INVOKABLE QString ChatPage::getAvatar(int uid) const
@@ -189,6 +218,11 @@ int ChatPage::getCurrentUid() const
 QString ChatPage::getCurrentName() const
 {
     return chat_list_model_->getNameByUid(current_chat_uid_);
+}
+
+QString ChatPage::getCurrentAvatar() const
+{
+    return current_avatar_;
 }
 
 SearchResult ChatPage::getSearchResult() const
