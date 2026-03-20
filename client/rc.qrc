@@ -51,5 +51,6 @@
         <file>assets/disagree.png</file>
         <file>assets/dianhua.png</file>
         <file>assets/shipin.png</file>
+        <file>assets/avatars/AI_Agent.png</file>
     </qresource>
 </RCC>

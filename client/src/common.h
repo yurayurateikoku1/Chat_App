@@ -19,7 +19,8 @@ enum class ReqId
     ID_TEXT_CHAT_MSG_REQ = 1017,        // 文本聊天信息请求
     ID_TEXT_CHAT_MSG_RSP = 1018,        // 文本聊天信息回复
     ID_NOTIFY_TEXT_CHAT_MSG_REQ = 1019, // 通知用户文本聊天信息
-
+    ID_AI_CHAT_REQ = 1025,              // AI聊天请求
+    ID_AI_CHAT_RSP = 1026,              // AI聊天回复
 };
 
 enum class Modules

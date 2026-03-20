@@ -125,3 +125,21 @@ service ChatService {
 	rpc NotifyTextChatMsg(TextChatMsgReq) returns (TextChatMsgRsp){}
 	rpc NotifyKickUser(KickUserReq) returns (KickUserRsp){}
 }
+
+// AI Chat - llama.cpp local LLM service
+message AIChatHistory {
+	string role = 1;    // "user" or "assistant"
+	string content = 2;
+}
+
+message AIChatReq {
+	int32 fromuid = 1;
+	string message = 2;
+	repeated AIChatHistory history = 3; // conversation context
+}
+
+message AIChatRsp {
+	int32 error = 1;
+	int32 fromuid = 2;
+	string message = 3; // AI response content
+}

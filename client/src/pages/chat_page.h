@@ -93,4 +93,5 @@ private:
     UserListModel *search_list_model_;                 ///< 搜索结果列表数据模型
     std::shared_ptr<SearchInfo> found_user_ = nullptr; ///< 精确查找到的用户信息
     bool has_friend_request_ = false;                  ///< 是否有未读好友申请
+    QJsonArray ai_chat_history_;                       ///< AI对话历史（多轮上下文）
 };

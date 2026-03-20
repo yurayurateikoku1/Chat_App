@@ -45,6 +45,7 @@ qt_add_resources(client "resources"
         assets/avatars/Artboard_28.png assets/avatars/Artboard_29.png assets/avatars/Artboard_30.png
         assets/avatars/Artboard_31.png assets/avatars/Artboard_32.png assets/avatars/Artboard_33.png
         assets/avatars/Artboard_34.png assets/avatars/Artboard_35.png
+        assets/avatars/AI_Agent.png
 )
 
 set_source_files_properties(src/pages/Common.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)

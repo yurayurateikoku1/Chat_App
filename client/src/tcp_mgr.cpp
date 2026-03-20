@@ -386,6 +386,38 @@ void TCPMgr::initHttpHandler()
                                    }
                                }
                            }});
+
+    // AI聊天回复
+    http_handlers_.insert({ReqId::ID_AI_CHAT_RSP, [this](ReqId id, int len, QByteArray data)
+                           {
+                               QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+                               if (json_doc.isNull())
+                               {
+                                   SPDLOG_ERROR("Json parse failed!");
+                                   return;
+                               }
+
+                               QJsonObject json_obj = json_doc.object();
+
+                               if (!json_obj.contains("error"))
+                               {
+                                   return;
+                               }
+
+                               int erro_code = json_obj.value("error").toInt();
+                               if (erro_code != 0)
+                               {
+                                   SPDLOG_ERROR("AI chat failed, error code: {}", erro_code);
+                                   return;
+                               }
+
+                               auto from_uid = json_obj.value("from_uid").toInt();
+                               auto message = json_obj.value("message").toString();
+
+                               SPDLOG_INFO("AI chat response for uid:{}, message:{}", from_uid, message.toStdString());
+                               emit signAIChatResponse(from_uid, message);
+                           }});
 }
 
 TCPMgr::~TCPMgr()

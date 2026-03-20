@@ -5,7 +5,6 @@
 #include "redis_mgr.h"
 #include "mysql_mgr.h"
 #include <spdlog/spdlog.h>
-
 ChatServiceImpl::ChatServiceImpl()
 {
 }
@@ -88,11 +87,14 @@ Status ChatServiceImpl::NotifyAuthFriend(ServerContext *context, const AuthFrien
 Status ChatServiceImpl::NotifyTextChatMsg(ServerContext *context, const TextChatMsgReq *request, TextChatMsgRsp *response)
 {
     auto to_uid = request->touid();
+    auto from_uid = request->fromuid();
+    SPDLOG_INFO("NotifyTextChatMsg received: from_uid={}, to_uid={}", from_uid, to_uid);
     auto session = UserMgr::getInstance().getCSeSsion(to_uid);
     response->set_error(static_cast<int32_t>(ErrorCode::SUCCESS));
 
     if (session == nullptr)
     {
+        SPDLOG_WARN("NotifyTextChatMsg: session not found for uid={}", to_uid);
         return Status::OK;
     }
 

@@ -34,6 +34,26 @@ ChatPage::ChatPage(QObject *parent)
         has_friend_request_ = true;
         emit hasFriendRequestChanged();
     }
+
+    // 接收AI聊天回复
+    connect(TCPMgr::getInstance().get(), &TCPMgr::signAIChatResponse, this, [this](int from_uid, const QString &message)
+            {
+        // AI的uid固定为0
+        constexpr int AI_UID = 0;
+        auto *model = chat_list_model_->getMessageModel(AI_UID);
+        if (model)
+        {
+            auto now = QDateTime::currentDateTime();
+            QString time_str = now.toString("hh:mm");
+            QString msgid = QUuid::createUuid().toString();
+            model->addMessage(msgid, message, time_str, false);
+        }
+
+        // 记录到历史
+        QJsonObject history_item;
+        history_item["role"] = "assistant";
+        history_item["content"] = message;
+        ai_chat_history_.append(history_item); });
 }
 
 Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
@@ -44,29 +64,50 @@ Q_INVOKABLE void ChatPage::sendMessage(int uid, const QString &message)
     auto *model = chat_list_model_->getMessageModel(uid);
     if (!model)
         return;
-    auto now = QDateTime::currentDateTime();
-    QString date_str = now.toString("yyyy-MM-dd");
-    QString time_str = now.toString("hh:mm");
-    // 生成唯一id
-    QUuid uuid = QUuid::createUuid();
-    QString id = uuid.toString();
-    QJsonObject json;
-    QJsonObject msg;
-    msg["msgid"] = id;
-    msg["content"] = message;
-    QJsonArray textArray;
-    textArray.append(msg);
-    int from_uid = UserMgr::getInstance().getUid();
-    json["from_uid"] = from_uid;
-    json["to_uid"] = uid;
-    json["text_array"] = textArray;
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
-    QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [data]()
-                              { TCPMgr::getInstance()->tcpSendData(ReqId::ID_TEXT_CHAT_MSG_REQ, data); }, Qt::QueuedConnection);
 
-    // TextChatData msg(id, message, from_uid, uid);
+    auto now = QDateTime::currentDateTime();
+    QString time_str = now.toString("hh:mm");
+    QString id = QUuid::createUuid().toString();
+
+    // 先把用户消息显示到界面
     model->addMessage(id, message, time_str, true);
+
+    if (uid == 0)
+    {
+        // AI聊天通道
+        QJsonObject history_item;
+        history_item["role"] = "user";
+        history_item["content"] = message;
+        ai_chat_history_.append(history_item);
+
+        QJsonObject json;
+        json["from_uid"] = UserMgr::getInstance().getUid();
+        json["message"] = message;
+        json["history"] = ai_chat_history_;
+
+        QJsonDocument doc(json);
+        QByteArray data = doc.toJson(QJsonDocument::Compact);
+        QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [data]()
+                                  { TCPMgr::getInstance()->tcpSendData(ReqId::ID_AI_CHAT_REQ, data); }, Qt::QueuedConnection);
+    }
+    else
+    {
+        // 普通聊天通道
+        QJsonObject json;
+        QJsonObject msg;
+        msg["msgid"] = id;
+        msg["content"] = message;
+        QJsonArray textArray;
+        textArray.append(msg);
+        json["from_uid"] = UserMgr::getInstance().getUid();
+        json["to_uid"] = uid;
+        json["text_array"] = textArray;
+
+        QJsonDocument doc(json);
+        QByteArray data = doc.toJson(QJsonDocument::Compact);
+        QMetaObject::invokeMethod(TCPMgr::getInstance().get(), [data]()
+                                  { TCPMgr::getInstance()->tcpSendData(ReqId::ID_TEXT_CHAT_MSG_REQ, data); }, Qt::QueuedConnection);
+    }
 }
 
 Q_INVOKABLE void ChatPage::switchChat(int uid)

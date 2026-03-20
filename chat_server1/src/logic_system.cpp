@@ -83,6 +83,8 @@ void LogicSystem::registerCallBacks()
     callBacks_.insert({static_cast<short>(MSG_IDS::ID_AUTH_FRIEND_REQ), std::bind(&LogicSystem::authFriendApplyHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
 
     callBacks_.insert({static_cast<short>(MSG_IDS::ID_TEXT_CHAT_MSG_REQ), std::bind(&LogicSystem::ChatTextMsgHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
+
+    callBacks_.insert({static_cast<short>(MSG_IDS::ID_AI_CHAT_REQ), std::bind(&LogicSystem::aiChatHandler, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)});
 }
 
 void LogicSystem::loginHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
@@ -511,4 +513,92 @@ bool LogicSystem::getFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<App
 bool LogicSystem::getFriendList(int uid, std::vector<std::shared_ptr<UserInfo>> &list)
 {
     return MysqlMgr::getInstance().getFriendList(uid, list);
+}
+
+void LogicSystem::aiChatHandler(std::shared_ptr<CSession> session, short msg_id, const std::string &msg_data)
+{
+    try
+    {
+        nlohmann::json root = nlohmann::json::parse(msg_data);
+        nlohmann::json return_root;
+        auto from_uid = root["from_uid"].get<int>();
+        auto message = root["message"].get<std::string>();
+
+        SPDLOG_INFO("aiChatHandler uid:{}, message:{}", from_uid, message);
+
+        // 构造 llama-server OpenAI 兼容请求
+        nlohmann::json messages_array = nlohmann::json::array();
+
+        // 添加系统提示
+        messages_array.push_back({{"role", "system"}, {"content", "You are a helpful assistant."}});
+
+        // 添加历史对话
+        if (root.contains("history") && root["history"].is_array())
+        {
+            for (const auto &item : root["history"])
+            {
+                messages_array.push_back({{"role", item["role"].get<std::string>()},
+                                          {"content", item["content"].get<std::string>()}});
+            }
+        }
+
+        // 添加当前用户消息
+        messages_array.push_back({{"role", "user"}, {"content", message}});
+
+        nlohmann::json llama_req;
+        llama_req["model"] = "local-model";
+        llama_req["messages"] = messages_array;
+        llama_req["temperature"] = 0.7;
+        llama_req["max_tokens"] = 1024;
+
+        std::string req_body = llama_req.dump();
+
+        // 从配置读取 llama-server 地址
+        auto &config = ConfigMgr::getInstance();
+        std::string llama_host = config["llama_server"]["host"];
+        std::string llama_port = config["llama_server"]["port"];
+
+        // 使用 Boost.Beast 发送 HTTP POST 到 llama-server
+        net::io_context ioc;
+        tcp::resolver resolver(ioc);
+        beast::tcp_stream stream(ioc);
+
+        auto const results = resolver.resolve(llama_host, llama_port);
+        stream.connect(results);
+
+        http::request<http::string_body> req{http::verb::post, "/v1/chat/completions", 11};
+        req.set(http::field::host, llama_host);
+        req.set(http::field::content_type, "application/json");
+        req.body() = req_body;
+        req.prepare_payload();
+
+        http::write(stream, req);
+
+        beast::flat_buffer buffer;
+        http::response<http::string_body> res;
+        http::read(stream, buffer, res);
+
+        beast::error_code ec;
+        stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+
+        // 解析 llama-server 响应
+        nlohmann::json llama_rsp = nlohmann::json::parse(res.body());
+        std::string ai_content = llama_rsp["choices"][0]["message"]["content"].get<std::string>();
+
+        return_root["error"] = 0;
+        return_root["from_uid"] = from_uid;
+        return_root["message"] = ai_content;
+
+        std::string msg = return_root.dump();
+        SPDLOG_INFO("aiChatHandler Sending response: {}", msg);
+        session->send(msg, static_cast<short>(MSG_IDS::ID_AI_CHAT_RSP));
+    }
+    catch (const std::exception &e)
+    {
+        SPDLOG_ERROR("aiChatHandler exception: {}", e.what());
+        nlohmann::json error_root;
+        error_root["error"] = 1;
+        error_root["message"] = "AI service unavailable";
+        session->send(error_root.dump(), static_cast<short>(MSG_IDS::ID_AI_CHAT_RSP));
+    }
 }

@@ -45,6 +45,15 @@ struct TableStruct_message_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_message_2eproto;
 namespace message {
+class AIChatHistory;
+struct AIChatHistoryDefaultTypeInternal;
+extern AIChatHistoryDefaultTypeInternal _AIChatHistory_default_instance_;
+class AIChatReq;
+struct AIChatReqDefaultTypeInternal;
+extern AIChatReqDefaultTypeInternal _AIChatReq_default_instance_;
+class AIChatRsp;
+struct AIChatRspDefaultTypeInternal;
+extern AIChatRspDefaultTypeInternal _AIChatRsp_default_instance_;
 class AddFriendReq;
 struct AddFriendReqDefaultTypeInternal;
 extern AddFriendReqDefaultTypeInternal _AddFriendReq_default_instance_;
@@ -104,6 +113,9 @@ struct TextChatMsgRspDefaultTypeInternal;
 extern TextChatMsgRspDefaultTypeInternal _TextChatMsgRsp_default_instance_;
 }  // namespace message
 PROTOBUF_NAMESPACE_OPEN
+template<> ::message::AIChatHistory* Arena::CreateMaybeMessage<::message::AIChatHistory>(Arena*);
+template<> ::message::AIChatReq* Arena::CreateMaybeMessage<::message::AIChatReq>(Arena*);
+template<> ::message::AIChatRsp* Arena::CreateMaybeMessage<::message::AIChatRsp>(Arena*);
 template<> ::message::AddFriendReq* Arena::CreateMaybeMessage<::message::AddFriendReq>(Arena*);
 template<> ::message::AddFriendRsp* Arena::CreateMaybeMessage<::message::AddFriendRsp>(Arena*);
 template<> ::message::AuthFriendReq* Arena::CreateMaybeMessage<::message::AuthFriendReq>(Arena*);
@@ -3405,6 +3417,534 @@ class KickUserRsp final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_message_2eproto;
 };
+// -------------------------------------------------------------------
+
+class AIChatHistory final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:message.AIChatHistory) */ {
+ public:
+  inline AIChatHistory() : AIChatHistory(nullptr) {}
+  ~AIChatHistory() override;
+  explicit PROTOBUF_CONSTEXPR AIChatHistory(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  AIChatHistory(const AIChatHistory& from);
+  AIChatHistory(AIChatHistory&& from) noexcept
+    : AIChatHistory() {
+    *this = ::std::move(from);
+  }
+
+  inline AIChatHistory& operator=(const AIChatHistory& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AIChatHistory& operator=(AIChatHistory&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AIChatHistory& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AIChatHistory* internal_default_instance() {
+    return reinterpret_cast<const AIChatHistory*>(
+               &_AIChatHistory_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    19;
+
+  friend void swap(AIChatHistory& a, AIChatHistory& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AIChatHistory* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AIChatHistory* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AIChatHistory* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<AIChatHistory>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const AIChatHistory& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const AIChatHistory& from) {
+    AIChatHistory::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AIChatHistory* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "message.AIChatHistory";
+  }
+  protected:
+  explicit AIChatHistory(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kRoleFieldNumber = 1,
+    kContentFieldNumber = 2,
+  };
+  // string role = 1;
+  void clear_role();
+  const std::string& role() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_role(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_role();
+  PROTOBUF_NODISCARD std::string* release_role();
+  void set_allocated_role(std::string* role);
+  private:
+  const std::string& _internal_role() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_role(const std::string& value);
+  std::string* _internal_mutable_role();
+  public:
+
+  // string content = 2;
+  void clear_content();
+  const std::string& content() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_content(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_content();
+  PROTOBUF_NODISCARD std::string* release_content();
+  void set_allocated_content(std::string* content);
+  private:
+  const std::string& _internal_content() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_content(const std::string& value);
+  std::string* _internal_mutable_content();
+  public:
+
+  // @@protoc_insertion_point(class_scope:message.AIChatHistory)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr role_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_message_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AIChatReq final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:message.AIChatReq) */ {
+ public:
+  inline AIChatReq() : AIChatReq(nullptr) {}
+  ~AIChatReq() override;
+  explicit PROTOBUF_CONSTEXPR AIChatReq(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  AIChatReq(const AIChatReq& from);
+  AIChatReq(AIChatReq&& from) noexcept
+    : AIChatReq() {
+    *this = ::std::move(from);
+  }
+
+  inline AIChatReq& operator=(const AIChatReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AIChatReq& operator=(AIChatReq&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AIChatReq& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AIChatReq* internal_default_instance() {
+    return reinterpret_cast<const AIChatReq*>(
+               &_AIChatReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    20;
+
+  friend void swap(AIChatReq& a, AIChatReq& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AIChatReq* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AIChatReq* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AIChatReq* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<AIChatReq>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const AIChatReq& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const AIChatReq& from) {
+    AIChatReq::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AIChatReq* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "message.AIChatReq";
+  }
+  protected:
+  explicit AIChatReq(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kHistoryFieldNumber = 3,
+    kMessageFieldNumber = 2,
+    kFromuidFieldNumber = 1,
+  };
+  // repeated .message.AIChatHistory history = 3;
+  int history_size() const;
+  private:
+  int _internal_history_size() const;
+  public:
+  void clear_history();
+  ::message::AIChatHistory* mutable_history(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::message::AIChatHistory >*
+      mutable_history();
+  private:
+  const ::message::AIChatHistory& _internal_history(int index) const;
+  ::message::AIChatHistory* _internal_add_history();
+  public:
+  const ::message::AIChatHistory& history(int index) const;
+  ::message::AIChatHistory* add_history();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::message::AIChatHistory >&
+      history() const;
+
+  // string message = 2;
+  void clear_message();
+  const std::string& message() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_message(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_message();
+  PROTOBUF_NODISCARD std::string* release_message();
+  void set_allocated_message(std::string* message);
+  private:
+  const std::string& _internal_message() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_message(const std::string& value);
+  std::string* _internal_mutable_message();
+  public:
+
+  // int32 fromuid = 1;
+  void clear_fromuid();
+  int32_t fromuid() const;
+  void set_fromuid(int32_t value);
+  private:
+  int32_t _internal_fromuid() const;
+  void _internal_set_fromuid(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:message.AIChatReq)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::message::AIChatHistory > history_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr message_;
+    int32_t fromuid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_message_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AIChatRsp final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:message.AIChatRsp) */ {
+ public:
+  inline AIChatRsp() : AIChatRsp(nullptr) {}
+  ~AIChatRsp() override;
+  explicit PROTOBUF_CONSTEXPR AIChatRsp(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  AIChatRsp(const AIChatRsp& from);
+  AIChatRsp(AIChatRsp&& from) noexcept
+    : AIChatRsp() {
+    *this = ::std::move(from);
+  }
+
+  inline AIChatRsp& operator=(const AIChatRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AIChatRsp& operator=(AIChatRsp&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AIChatRsp& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AIChatRsp* internal_default_instance() {
+    return reinterpret_cast<const AIChatRsp*>(
+               &_AIChatRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    21;
+
+  friend void swap(AIChatRsp& a, AIChatRsp& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AIChatRsp* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AIChatRsp* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AIChatRsp* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<AIChatRsp>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const AIChatRsp& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const AIChatRsp& from) {
+    AIChatRsp::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AIChatRsp* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "message.AIChatRsp";
+  }
+  protected:
+  explicit AIChatRsp(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMessageFieldNumber = 3,
+    kErrorFieldNumber = 1,
+    kFromuidFieldNumber = 2,
+  };
+  // string message = 3;
+  void clear_message();
+  const std::string& message() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_message(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_message();
+  PROTOBUF_NODISCARD std::string* release_message();
+  void set_allocated_message(std::string* message);
+  private:
+  const std::string& _internal_message() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_message(const std::string& value);
+  std::string* _internal_mutable_message();
+  public:
+
+  // int32 error = 1;
+  void clear_error();
+  int32_t error() const;
+  void set_error(int32_t value);
+  private:
+  int32_t _internal_error() const;
+  void _internal_set_error(int32_t value);
+  public:
+
+  // int32 fromuid = 2;
+  void clear_fromuid();
+  int32_t fromuid() const;
+  void set_fromuid(int32_t value);
+  private:
+  int32_t _internal_fromuid() const;
+  void _internal_set_fromuid(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:message.AIChatRsp)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr message_;
+    int32_t error_;
+    int32_t fromuid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_message_2eproto;
+};
 // ===================================================================
 
 
@@ -5038,9 +5578,327 @@ inline void KickUserRsp::set_uid(int32_t value) {
   // @@protoc_insertion_point(field_set:message.KickUserRsp.uid)
 }
 
+// -------------------------------------------------------------------
+
+// AIChatHistory
+
+// string role = 1;
+inline void AIChatHistory::clear_role() {
+  _impl_.role_.ClearToEmpty();
+}
+inline const std::string& AIChatHistory::role() const {
+  // @@protoc_insertion_point(field_get:message.AIChatHistory.role)
+  return _internal_role();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AIChatHistory::set_role(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.role_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:message.AIChatHistory.role)
+}
+inline std::string* AIChatHistory::mutable_role() {
+  std::string* _s = _internal_mutable_role();
+  // @@protoc_insertion_point(field_mutable:message.AIChatHistory.role)
+  return _s;
+}
+inline const std::string& AIChatHistory::_internal_role() const {
+  return _impl_.role_.Get();
+}
+inline void AIChatHistory::_internal_set_role(const std::string& value) {
+  
+  _impl_.role_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AIChatHistory::_internal_mutable_role() {
+  
+  return _impl_.role_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AIChatHistory::release_role() {
+  // @@protoc_insertion_point(field_release:message.AIChatHistory.role)
+  return _impl_.role_.Release();
+}
+inline void AIChatHistory::set_allocated_role(std::string* role) {
+  if (role != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.role_.SetAllocated(role, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.role_.IsDefault()) {
+    _impl_.role_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.AIChatHistory.role)
+}
+
+// string content = 2;
+inline void AIChatHistory::clear_content() {
+  _impl_.content_.ClearToEmpty();
+}
+inline const std::string& AIChatHistory::content() const {
+  // @@protoc_insertion_point(field_get:message.AIChatHistory.content)
+  return _internal_content();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AIChatHistory::set_content(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.content_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:message.AIChatHistory.content)
+}
+inline std::string* AIChatHistory::mutable_content() {
+  std::string* _s = _internal_mutable_content();
+  // @@protoc_insertion_point(field_mutable:message.AIChatHistory.content)
+  return _s;
+}
+inline const std::string& AIChatHistory::_internal_content() const {
+  return _impl_.content_.Get();
+}
+inline void AIChatHistory::_internal_set_content(const std::string& value) {
+  
+  _impl_.content_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AIChatHistory::_internal_mutable_content() {
+  
+  return _impl_.content_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AIChatHistory::release_content() {
+  // @@protoc_insertion_point(field_release:message.AIChatHistory.content)
+  return _impl_.content_.Release();
+}
+inline void AIChatHistory::set_allocated_content(std::string* content) {
+  if (content != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.content_.SetAllocated(content, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.content_.IsDefault()) {
+    _impl_.content_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.AIChatHistory.content)
+}
+
+// -------------------------------------------------------------------
+
+// AIChatReq
+
+// int32 fromuid = 1;
+inline void AIChatReq::clear_fromuid() {
+  _impl_.fromuid_ = 0;
+}
+inline int32_t AIChatReq::_internal_fromuid() const {
+  return _impl_.fromuid_;
+}
+inline int32_t AIChatReq::fromuid() const {
+  // @@protoc_insertion_point(field_get:message.AIChatReq.fromuid)
+  return _internal_fromuid();
+}
+inline void AIChatReq::_internal_set_fromuid(int32_t value) {
+  
+  _impl_.fromuid_ = value;
+}
+inline void AIChatReq::set_fromuid(int32_t value) {
+  _internal_set_fromuid(value);
+  // @@protoc_insertion_point(field_set:message.AIChatReq.fromuid)
+}
+
+// string message = 2;
+inline void AIChatReq::clear_message() {
+  _impl_.message_.ClearToEmpty();
+}
+inline const std::string& AIChatReq::message() const {
+  // @@protoc_insertion_point(field_get:message.AIChatReq.message)
+  return _internal_message();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AIChatReq::set_message(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.message_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:message.AIChatReq.message)
+}
+inline std::string* AIChatReq::mutable_message() {
+  std::string* _s = _internal_mutable_message();
+  // @@protoc_insertion_point(field_mutable:message.AIChatReq.message)
+  return _s;
+}
+inline const std::string& AIChatReq::_internal_message() const {
+  return _impl_.message_.Get();
+}
+inline void AIChatReq::_internal_set_message(const std::string& value) {
+  
+  _impl_.message_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AIChatReq::_internal_mutable_message() {
+  
+  return _impl_.message_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AIChatReq::release_message() {
+  // @@protoc_insertion_point(field_release:message.AIChatReq.message)
+  return _impl_.message_.Release();
+}
+inline void AIChatReq::set_allocated_message(std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.message_.SetAllocated(message, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.message_.IsDefault()) {
+    _impl_.message_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.AIChatReq.message)
+}
+
+// repeated .message.AIChatHistory history = 3;
+inline int AIChatReq::_internal_history_size() const {
+  return _impl_.history_.size();
+}
+inline int AIChatReq::history_size() const {
+  return _internal_history_size();
+}
+inline void AIChatReq::clear_history() {
+  _impl_.history_.Clear();
+}
+inline ::message::AIChatHistory* AIChatReq::mutable_history(int index) {
+  // @@protoc_insertion_point(field_mutable:message.AIChatReq.history)
+  return _impl_.history_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::message::AIChatHistory >*
+AIChatReq::mutable_history() {
+  // @@protoc_insertion_point(field_mutable_list:message.AIChatReq.history)
+  return &_impl_.history_;
+}
+inline const ::message::AIChatHistory& AIChatReq::_internal_history(int index) const {
+  return _impl_.history_.Get(index);
+}
+inline const ::message::AIChatHistory& AIChatReq::history(int index) const {
+  // @@protoc_insertion_point(field_get:message.AIChatReq.history)
+  return _internal_history(index);
+}
+inline ::message::AIChatHistory* AIChatReq::_internal_add_history() {
+  return _impl_.history_.Add();
+}
+inline ::message::AIChatHistory* AIChatReq::add_history() {
+  ::message::AIChatHistory* _add = _internal_add_history();
+  // @@protoc_insertion_point(field_add:message.AIChatReq.history)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::message::AIChatHistory >&
+AIChatReq::history() const {
+  // @@protoc_insertion_point(field_list:message.AIChatReq.history)
+  return _impl_.history_;
+}
+
+// -------------------------------------------------------------------
+
+// AIChatRsp
+
+// int32 error = 1;
+inline void AIChatRsp::clear_error() {
+  _impl_.error_ = 0;
+}
+inline int32_t AIChatRsp::_internal_error() const {
+  return _impl_.error_;
+}
+inline int32_t AIChatRsp::error() const {
+  // @@protoc_insertion_point(field_get:message.AIChatRsp.error)
+  return _internal_error();
+}
+inline void AIChatRsp::_internal_set_error(int32_t value) {
+  
+  _impl_.error_ = value;
+}
+inline void AIChatRsp::set_error(int32_t value) {
+  _internal_set_error(value);
+  // @@protoc_insertion_point(field_set:message.AIChatRsp.error)
+}
+
+// int32 fromuid = 2;
+inline void AIChatRsp::clear_fromuid() {
+  _impl_.fromuid_ = 0;
+}
+inline int32_t AIChatRsp::_internal_fromuid() const {
+  return _impl_.fromuid_;
+}
+inline int32_t AIChatRsp::fromuid() const {
+  // @@protoc_insertion_point(field_get:message.AIChatRsp.fromuid)
+  return _internal_fromuid();
+}
+inline void AIChatRsp::_internal_set_fromuid(int32_t value) {
+  
+  _impl_.fromuid_ = value;
+}
+inline void AIChatRsp::set_fromuid(int32_t value) {
+  _internal_set_fromuid(value);
+  // @@protoc_insertion_point(field_set:message.AIChatRsp.fromuid)
+}
+
+// string message = 3;
+inline void AIChatRsp::clear_message() {
+  _impl_.message_.ClearToEmpty();
+}
+inline const std::string& AIChatRsp::message() const {
+  // @@protoc_insertion_point(field_get:message.AIChatRsp.message)
+  return _internal_message();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AIChatRsp::set_message(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.message_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:message.AIChatRsp.message)
+}
+inline std::string* AIChatRsp::mutable_message() {
+  std::string* _s = _internal_mutable_message();
+  // @@protoc_insertion_point(field_mutable:message.AIChatRsp.message)
+  return _s;
+}
+inline const std::string& AIChatRsp::_internal_message() const {
+  return _impl_.message_.Get();
+}
+inline void AIChatRsp::_internal_set_message(const std::string& value) {
+  
+  _impl_.message_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AIChatRsp::_internal_mutable_message() {
+  
+  return _impl_.message_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AIChatRsp::release_message() {
+  // @@protoc_insertion_point(field_release:message.AIChatRsp.message)
+  return _impl_.message_.Release();
+}
+inline void AIChatRsp::set_allocated_message(std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.message_.SetAllocated(message, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.message_.IsDefault()) {
+    _impl_.message_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.AIChatRsp.message)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

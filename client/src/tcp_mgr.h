@@ -54,4 +54,7 @@ signals:
 
     /// @brief 接收好友申请
     void signReceiveFriendApply(std::shared_ptr<AddFriendApply> apply);
+
+    /// @brief 接收AI聊天回复
+    void signAIChatResponse(int from_uid, const QString &message);
 };
